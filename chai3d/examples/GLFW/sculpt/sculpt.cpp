@@ -180,9 +180,9 @@ double stiffnessMultiplier = 0.9;
 // Setting-up variables to discover the appropriate rotateExtrinsicEulerAnglesDeg
 // Hand
 
-double rotationX = 282;
-double rotationY = 56;
-double rotationZ = 124;
+double rotationX = 0;
+double rotationY = 0;
+double rotationZ = 0;
 
 
 //double rotationX = 0;
@@ -225,6 +225,17 @@ cMultiMesh* tray;
 cHapticDeviceInfo hapticDeviceInfo;
 
 bool topView = true;
+
+// UI Layer and components
+cTexture2dPtr sandwichIcon;
+cPanel* panel;
+cLabel* button1;
+cLabel* button2;
+cLabel* button3;
+cLabel* button4;
+cPanel* sandwichButton;
+bool isUILayerVisible = true;
+
 
 //------------------------------------------------------------------------------
 // OCULUS RIFT
@@ -280,6 +291,9 @@ void close(void);
 
 int countFilesInDirectory(const std::string& path, const std::string& extension);
 
+bool isPointInsideLabel(cLabel* label, double x, double y);
+
+bool isPointInsidePanel(cPanel* panel, double x, double y);
 
 int main(int argc, char* argv[])
 {
@@ -375,6 +389,14 @@ int main(int argc, char* argv[])
 
     // set current display context
     glfwMakeContextCurrent(window);
+
+    // set fullscreen or window mode
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    if (fullscreen)
+    {
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        glfwSwapInterval(swapInterval);
+    }
 
     // sets the swap interval for the current display context
     glfwSwapInterval(swapInterval);
@@ -819,20 +841,68 @@ int main(int argc, char* argv[])
     camera->m_backLayer->addChild(background);
     background->setColor(backgroundColor);
 
-    //camera->setUseMultipassTransparency(true);
+    // Load the sandwich icon
+    sandwichIcon = cTexture2d::create();
+    bool fileload = sandwichIcon->loadFromFile("resources/images/menu.png");
+    if (!fileload)
+    {
+        // Handle error if icon is not loaded
+        cout << "Error - Sandwich icon image failed to load correctly." << endl;
+        return -1;
+    }
 
-    // set background properties
-    /*background->setCornerColors(cColorf(1.0f, 1.0f, 1.0f),
-                                cColorf(1.0f, 1.0f, 1.0f),
-                                cColorf(0.7f, 0.7f, 0.7f),
-                                cColorf(0.7f, 0.7f, 0.7f));*/
+    // Create a panel for UI
+    panel = new cPanel();
+    camera->m_frontLayer->addChild(panel);
+    panel->setLocalPos(10, 0);
+    panel->setSize(190, height - 50); // Adjust width and height
+    panel->setCornerRadius(10, 10, 10, 10);
+    panel->setTransparencyLevel(0.5);
+    panel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
+
+    // Create button 1 (vertical sequence)
+    button1 = new cLabel(font);
+    panel->addChild(button1);
+    button1->setLocalPos(20, panel->getHeight() - 50); // Adjusted positions
+    button1->setText("Button 1");
+    button1->m_fontColor.setWhite();
+
+    // Create button 2 (vertical sequence)
+    button2 = new cLabel(font);
+    panel->addChild(button2);
+    button2->setLocalPos(20, panel->getHeight() - 100); // Adjusted positions
+    button2->setText("Button 2");
+    button2->m_fontColor.setWhite();
+
+    // Create button 3 (vertical sequence)
+    button3 = new cLabel(font);
+    panel->addChild(button3);
+    button3->setLocalPos(20, panel->getHeight() - 150); // Adjusted positions
+    button3->setText("Button 3");
+    button3->m_fontColor.setWhite();
+
+    // Create button 4 (vertical sequence)
+    button4 = new cLabel(font);
+    panel->addChild(button4);
+    button4->setLocalPos(20, panel->getHeight() - 200); // Adjusted positions
+    button4->setText("Button 4");
+    button4->m_fontColor.setWhite();
+
+    // Create sandwich button to toggle panel visibility
+    sandwichButton = new cPanel();
+    camera->m_frontLayer->addChild(sandwichButton);
+    sandwichButton->setLocalPos(10, height - 50); // Position near top left corner
+    sandwichButton->setSize(30, 30); // Set size of the button
+    sandwichButton->setCornerRadius(5, 5, 5, 5);
+    sandwichButton->setTexture(sandwichIcon);
+    sandwichButton->setUseTexture(true);
 
 
-                                //--------------------------------------------------------------------------
-                                // START SIMULATION
-                                //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // START SIMULATION
+    //--------------------------------------------------------------------------
 
-                                // create a thread which starts the main haptics rendering loop
+    // create a thread which starts the main haptics rendering loop
     hapticsThread = new cThread();
     hapticsThread->start(updateHaptics, CTHREAD_PRIORITY_HAPTICS);
 
@@ -1233,12 +1303,17 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     else if (a_key == GLFW_KEY_S)
     {
         mutexObject.acquire();
-        image->saveToFiles("volume", "png");
+        image->saveToFiles("output/volumes/volume", "png");
         mutexObject.release();
         cout << "> Volume image saved to disk                       \r";
     }
+    else if (a_key == GLFW_KEY_TAB)
+    {
+        isUILayerVisible = !isUILayerVisible;
+        panel->setShowEnabled(isUILayerVisible);
+    }
 
-    else if (a_key == GLFW_KEY_O)
+    /*else if (a_key == GLFW_KEY_O)
     {
         toolOne = 0;
         toolTwo = 1;
@@ -1248,7 +1323,7 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     {
         toolOne = 1;
         toolTwo = 0;
-    }
+    }*/
 
 
 }
@@ -1257,6 +1332,43 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
 
 void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods)
 {
+    
+    if (a_button == GLFW_MOUSE_BUTTON_LEFT && a_action == GLFW_PRESS)
+    {
+        // Get mouse position
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        // Adjust y position because of OpenGL's coordinate system
+        ypos = height - ypos;
+
+        // Check if sandwich button was clicked
+        if (isPointInsidePanel(sandwichButton, xpos, ypos)) {
+            isUILayerVisible = !isUILayerVisible;
+            panel->setShowEnabled(isUILayerVisible);
+        }
+
+        // Check if button 1 was clicked
+        else if (isPointInsideLabel(button1, xpos, ypos)) {
+            cout << "Button 1 clicked" << endl;
+        }
+
+        // Check if button 2 was clicked
+        else if (isPointInsideLabel(button2, xpos, ypos)) {
+            cout << "Button 2 clicked" << endl;
+        }
+
+        // Check if button 3 was clicked
+        else if (isPointInsideLabel(button3, xpos, ypos)) {
+            cout << "Button 3 clicked" << endl;
+        }
+
+        // Check if button 4 was clicked
+        else if (isPointInsideLabel(button4, xpos, ypos)) {
+            cout << "Button 4 clicked" << endl;
+        }
+    }
+
     if (a_button == GLFW_MOUSE_BUTTON_RIGHT && a_action == GLFW_PRESS)
     {
         // store mouse position
@@ -1583,3 +1695,25 @@ void updateHaptics(void)
 }
 
 //------------------------------------------------------------------------------
+
+bool isPointInsideLabel(cLabel* label, double x, double y)
+{
+    double labelX = label->getLocalPos().x();
+    double labelY = label->getLocalPos().y();
+    double labelWidth = label->getWidth();
+    double labelHeight = label->getHeight();
+
+    return (x >= labelX && x <= labelX + labelWidth &&
+        y >= labelY && y <= labelY + labelHeight);
+}
+
+bool isPointInsidePanel(cPanel* panel, double x, double y)
+{
+    double panelX = panel->getLocalPos().x();
+    double panelY = panel->getLocalPos().y();
+    double panelWidth = panel->getWidth();
+    double panelHeight = panel->getHeight();
+
+    return (x >= panelX && x <= panelX + panelWidth &&
+        y >= panelY && y <= panelY + panelHeight);
+}

@@ -131,6 +131,7 @@ double mouseX, mouseY;
 
 // haptic thread
 cThread* hapticsThread;
+cThread* polyTaskThread;
 
 // a handle to window display context
 GLFWwindow* window = NULL;
@@ -233,9 +234,17 @@ cLabel* button1;
 cLabel* button2;
 cLabel* button3;
 cLabel* button4;
+cLabel* button5;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
+// System status panel and components
+cPanel* statusPanel;
+cLabel* statusMessage;
+bool isStatusMessageVisible = false;
+
+double statusPanelDisplayTime = 0.0;
+double statusMessageDisplayTime = 0.0;
 
 //------------------------------------------------------------------------------
 // OCULUS RIFT
@@ -294,6 +303,14 @@ int countFilesInDirectory(const std::string& path, const std::string& extension)
 bool isPointInsideLabel(cLabel* label, double x, double y);
 
 bool isPointInsidePanel(cPanel* panel, double x, double y);
+
+void polygonize();
+
+void showStatusMessageForSeconds(double seconds, const std::string& message);
+
+void toggleStatusMessage(bool on, const std::string& message);
+
+void startPolygonize();
 
 int main(int argc, char* argv[])
 {
@@ -822,10 +839,10 @@ int main(int argc, char* argv[])
 
     // create a label to display the haptic and graphic rate of the simulation
     labelRates = new cLabel(font);
-    camera->m_frontLayer->addChild(labelRates);
+    //camera->m_frontLayer->addChild(labelRates);
 
     // set font color
-    labelRates->m_fontColor.setWhite();
+    //labelRates->m_fontColor.setWhite();
 
     // create a small message
     labelMessage = new cLabel(font);
@@ -864,29 +881,35 @@ int main(int argc, char* argv[])
     button1 = new cLabel(font);
     panel->addChild(button1);
     button1->setLocalPos(20, panel->getHeight() - 50); // Adjusted positions
-    button1->setText("Button 1");
+    button1->setText("Load Dataset (L)");
     button1->m_fontColor.setWhite();
 
     // Create button 2 (vertical sequence)
     button2 = new cLabel(font);
     panel->addChild(button2);
     button2->setLocalPos(20, panel->getHeight() - 100); // Adjusted positions
-    button2->setText("Button 2");
+    button2->setText("Export Model (M)");
     button2->m_fontColor.setWhite();
 
     // Create button 3 (vertical sequence)
     button3 = new cLabel(font);
     panel->addChild(button3);
     button3->setLocalPos(20, panel->getHeight() - 150); // Adjusted positions
-    button3->setText("Button 3");
+    button3->setText("Export Volume (V)");
     button3->m_fontColor.setWhite();
 
     // Create button 4 (vertical sequence)
     button4 = new cLabel(font);
     panel->addChild(button4);
     button4->setLocalPos(20, panel->getHeight() - 200); // Adjusted positions
-    button4->setText("Button 4");
+    button4->setText("Toggle Ghost Mode (Space)");
     button4->m_fontColor.setWhite();
+
+    button5 = new cLabel(font);
+    panel->addChild(button5);
+    button5->setLocalPos(20, panel->getHeight() - 250); // Adjusted positions
+    button5->setText("Toggle Haptics (H)");
+    button5->m_fontColor.setWhite();
 
     // Create sandwich button to toggle panel visibility
     sandwichButton = new cPanel();
@@ -897,6 +920,24 @@ int main(int argc, char* argv[])
     sandwichButton->setTexture(sandwichIcon);
     sandwichButton->setUseTexture(true);
 
+    //// Create a system status panel
+    //statusPanel = new cPanel();
+    //camera->m_frontLayer->addChild(statusPanel);
+    //statusPanel->setSize(200, 50); // Adjust width and height
+    //statusPanel->setCornerRadius(10, 10, 10, 10);
+    //statusPanel->setLocalPos((int)(0.5 * (width - statusPanel->getWidth())), 40);
+    //statusPanel->setTransparencyLevel(0.5);
+    //statusPanel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
+    //statusPanel->setShowEnabled(isStatusPanelVisible);
+
+    statusMessage = new cLabel(font);
+    camera->m_frontLayer->addChild(statusMessage);
+    statusMessage->m_fontColor.setWhite();
+    statusMessage->setText("System Status");
+
+    // Center the status message horizontally
+    statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
+    statusMessage->setShowEnabled(isStatusMessageVisible);
 
     //--------------------------------------------------------------------------
     // START SIMULATION
@@ -1201,14 +1242,7 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     // option - polygonize model and save to file
     else if (a_key == GLFW_KEY_P)
     {
-        cMultiMesh* surface = new cMultiMesh;
-        object->polygonize(surface, 0.004, 0.004, 0.010);
-        double SCALE = 0.1;
-        double METERS_TO_MILLIMETERS = 1000.0;
-        surface->scale(SCALE * METERS_TO_MILLIMETERS);
-        surface->saveToFile("output/models/human.stl");
-        cout << "> Volume has been polygonized and saved to disk                            \r";
-        delete surface;
+        startPolygonize();
     }
 
     // option - toggle fullscreen
@@ -1311,6 +1345,7 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     {
         isUILayerVisible = !isUILayerVisible;
         panel->setShowEnabled(isUILayerVisible);
+        toggleStatusMessage(isUILayerVisible, "Menu");
     }
 
     /*else if (a_key == GLFW_KEY_O)
@@ -1377,6 +1412,7 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
         // update mouse state
         mouseState = MOUSE_MOVE_CAMERA;
     }
+
 
     else
     {
@@ -1461,6 +1497,7 @@ void close(void)
 
     // delete resources
     delete hapticsThread;
+    delete polyTaskThread;
     delete world;
     delete handler;
 }
@@ -1476,20 +1513,20 @@ void updateGraphics(void)
 
 
     // update position of label
-    labelRates->setLocalPos((int)(0.5 * (width - labelRates->getWidth())), 15);
+    //labelRates->setLocalPos((int)(0.5 * (width - labelRates->getWidth())), 15);
 
     // update position of message label
-    labelMessage->setLocalPos((int)(0.5 * (width - labelMessage->getWidth())), 40);
+    //labelMessage->setLocalPos((int)(0.5 * (width - labelMessage->getWidth())), 40);
 
 
     //labelMessage->setText(cStr(unroundedX));
     //labelMessage->setText(cStr(voxelIndexX));
-    labelMessage->setText("X: " + cStr(voxelIndexX) + "Y: " + cStr(voxelIndexY) + "Z: " + cStr(voxelIndexZ) + " R: " + cStr(voxelColor.getR()));
+    //labelMessage->setText("X: " + cStr(voxelIndexX) + "Y: " + cStr(voxelIndexY) + "Z: " + cStr(voxelIndexZ) + " R: " + cStr(voxelColor.getR()));
     //labelMessage->setText(cStr(position.get(0)));
 
     // update haptic and graphic rate data
-    labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
-        cStr(freqCounterHaptics.getFrequency(), 0) + " Hz");
+    //labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
+        //cStr(freqCounterHaptics.getFrequency(), 0) + " Hz");
 
     /////////////////////////////////////////////////////////////////////
     // VOLUME UPDATE
@@ -1507,6 +1544,13 @@ void updateGraphics(void)
         flagMarkVolumeForUpdate = false;
     }
 
+    // Check if the status message should be hidden (temporary messages)
+    if (isStatusMessageVisible && statusMessageDisplayTime > 0 && glfwGetTime() > statusMessageDisplayTime)
+    {
+        isStatusMessageVisible = false;
+        statusMessage->setShowEnabled(false);
+        statusMessageDisplayTime = 0; // Reset display time
+    }
 
     /////////////////////////////////////////////////////////////////////
     // RENDER SCENE
@@ -1716,4 +1760,54 @@ bool isPointInsidePanel(cPanel* panel, double x, double y)
 
     return (x >= panelX && x <= panelX + panelWidth &&
         y >= panelY && y <= panelY + panelHeight);
+}
+
+void startPolygonize()
+{
+    toggleStatusMessage(true, "Exporting Object ...");
+    glfwPollEvents();
+    updateGraphics();
+
+    polyTaskThread = new cThread();
+    polyTaskThread->start(polygonize, CTHREAD_PRIORITY_GRAPHICS);
+}
+
+void polygonize()
+{
+    
+
+    cMultiMesh* surface = new cMultiMesh;
+    object->polygonize(surface, 0.004, 0.004, 0.010);
+    double SCALE = 0.1;
+    double METERS_TO_MILLIMETERS = 1000.0;
+    surface->scale(SCALE * METERS_TO_MILLIMETERS);
+    surface->saveToFile("output/models/model.stl");
+    toggleStatusMessage(false,"");
+    showStatusMessageForSeconds(3.0, "Object Exported");
+    delete surface;
+}
+
+
+
+void showStatusMessageForSeconds(double seconds, const std::string& message)
+{
+    isStatusMessageVisible = true;
+    statusMessageDisplayTime = glfwGetTime() + seconds;
+    statusMessage->setText(message);
+    // Center the status message horizontally
+    statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
+    statusMessage->setShowEnabled(true);
+}
+
+void toggleStatusMessage(bool on, const std::string& message)
+{
+    isStatusMessageVisible = on;
+    statusMessageDisplayTime = 0; // Clear any display time
+    if (isStatusMessageVisible)
+    {
+        statusMessage->setText(message);
+        // Center the status message horizontally
+        statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
+    }
+    statusMessage->setShowEnabled(isStatusMessageVisible);
 }

@@ -1,0 +1,56 @@
+# Folders
+.vs/
+bin
+modules/GEL/bin/
+modules/GEL/.vs/
+modules/OCULUS/bin/
+modules/OCULUS/.vs/
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.stl
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+
+# VS stuff
+*.ipch
+*.pdb
+*.vsidx
+*.db
+*.bin
+*.bsc
+*.tlog
+
+*.log
+
+# Exceptions
+!bin/resources/shaders/hole.frag

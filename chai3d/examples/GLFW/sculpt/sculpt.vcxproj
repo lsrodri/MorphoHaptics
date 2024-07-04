@@ -19,7 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="includes\tinyfiledialogs.c" />
     <ClCompile Include="sculpt.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="includes\tinyfiledialogs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>sculpt</ProjectName>
@@ -225,7 +229,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../src;../../../external/Eigen;../../../external/glew/include;../../../extras/glfw/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src;../../../external/Eigen;../../../external/glew/include;../../../extras/glfw/include;includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN64;NDEBUG;_CONSOLE;_MSVC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

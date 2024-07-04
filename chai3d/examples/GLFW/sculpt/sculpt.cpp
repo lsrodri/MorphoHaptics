@@ -10,9 +10,14 @@
 //------------------------------------------------------------------------------
 #include <GLFW/glfw3.h>
 
+
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <tinyfiledialogs.h>
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 //------------------------------------------------------------------------------
 //#include "COculus.h"
@@ -311,6 +316,8 @@ void showStatusMessageForSeconds(double seconds, const std::string& message);
 void toggleStatusMessage(bool on, const std::string& message);
 
 void startPolygonize();
+
+std::string selectFolder();
 
 int main(int argc, char* argv[])
 {
@@ -1385,7 +1392,7 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
         // Check if button 1 was clicked
         else if (isPointInsideLabel(button1, xpos, ypos)) {
-            cout << "Button 1 clicked" << endl;
+            selectFolder();
         }
 
         // Check if button 2 was clicked
@@ -1764,7 +1771,7 @@ bool isPointInsidePanel(cPanel* panel, double x, double y)
 
 void startPolygonize()
 {
-    toggleStatusMessage(true, "Exporting Object ...");
+    toggleStatusMessage(true, "Exporting Object...");
     glfwPollEvents();
     updateGraphics();
 
@@ -1810,4 +1817,21 @@ void toggleStatusMessage(bool on, const std::string& message)
         statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
     }
     statusMessage->setShowEnabled(isStatusMessageVisible);
+}
+
+std::string selectFolder()
+{
+    const char* path = tinyfd_selectFolderDialog("Select Folder", nullptr);
+    if (path)
+    {
+        HWND hwnd = glfwGetWin32Window(window);
+
+        // Minimize and restore the window to ensure it regains focus
+        ShowWindow(hwnd, SW_MINIMIZE);
+        ShowWindow(hwnd, SW_RESTORE);
+
+        SetForegroundWindow(hwnd);
+        return std::string(path);
+    }
+    return std::string();
 }

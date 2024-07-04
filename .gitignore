@@ -6,6 +6,7 @@ chai3d/modules/GEL/.vs/
 chai3d/modules/OCULUS/bin/
 chai3d/modules/OCULUS/.vs/
 **/obj/
+**/output/
 
 # Prerequisites
 *.d

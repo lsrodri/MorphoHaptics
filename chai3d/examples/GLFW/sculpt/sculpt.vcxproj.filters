@@ -10,5 +10,11 @@
     <ClCompile Include="sculpt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="includes\tinyfiledialogs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="includes\tinyfiledialogs.h" />
   </ItemGroup>
 </Project>

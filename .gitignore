@@ -1,10 +1,11 @@
 # Folders
-.vs/
-bin
-modules/GEL/bin/
-modules/GEL/.vs/
-modules/OCULUS/bin/
-modules/OCULUS/.vs/
+chai3d/.vs/
+chai3d/bin
+chai3d/modules/GEL/bin/
+chai3d/modules/GEL/.vs/
+chai3d/modules/OCULUS/bin/
+chai3d/modules/OCULUS/.vs/
+**/obj/
 
 # Prerequisites
 *.d
@@ -51,6 +52,3 @@ modules/OCULUS/.vs/
 *.tlog
 
 *.log
-
-# Exceptions
-!bin/resources/shaders/hole.frag

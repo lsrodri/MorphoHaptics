@@ -137,6 +137,7 @@ double mouseX, mouseY;
 // haptic thread
 cThread* hapticsThread;
 cThread* polyTaskThread;
+cThread* exportVolumeThread;
 
 // a handle to window display context
 GLFWwindow* window = NULL;
@@ -251,6 +252,8 @@ bool isStatusMessageVisible = false;
 double statusPanelDisplayTime = 0.0;
 double statusMessageDisplayTime = 0.0;
 
+bool isHapticsEnabled = true;
+
 //------------------------------------------------------------------------------
 // OCULUS RIFT
 //------------------------------------------------------------------------------
@@ -318,6 +321,14 @@ void toggleStatusMessage(bool on, const std::string& message);
 void startPolygonize();
 
 std::string selectFolder();
+
+void exportVolume();
+
+void startExportVolume();
+
+void toggleGhostMode();
+
+void toggleHaptics();
 
 int main(int argc, char* argv[])
 {
@@ -525,7 +536,7 @@ int main(int argc, char* argv[])
         mat.m_diffuse.set(0.8f, 0.8f, 0.8f);
         mat.m_specular.set(1.0f, 1.0f, 1.0f);
         //mat.setWhite();
-        mat.setRedDark();
+        mat.setWhite();
 
 
         // Duplicate the material to create a copy
@@ -909,13 +920,13 @@ int main(int argc, char* argv[])
     button4 = new cLabel(font);
     panel->addChild(button4);
     button4->setLocalPos(20, panel->getHeight() - 200); // Adjusted positions
-    button4->setText("Toggle Ghost Mode (Space)");
+    button4->setText("(off) Ghost Mode (Space)");
     button4->m_fontColor.setWhite();
 
     button5 = new cLabel(font);
     panel->addChild(button5);
     button5->setLocalPos(20, panel->getHeight() - 250); // Adjusted positions
-    button5->setText("Toggle Haptics (H)");
+    button5->setText("(on) Haptics (H)");
     button5->m_fontColor.setWhite();
 
     // Create sandwich button to toggle panel visibility
@@ -1230,24 +1241,26 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         object->m_minTextureCoord.z(0.5 - value);
         cout << "> Increase size along Z axis.                            \r";
     }
-    // option - decrease quality of graphic rendering
-    else if (a_key == GLFW_KEY_L)
-    {
-        double value = object->getQuality();
-        object->setQuality(value - 0.1);
-        cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
-    }
+    //// option - decrease quality of graphic rendering
+    //else if (a_key == GLFW_KEY_L)
+    //{
+    //    double value = object->getQuality();
+    //    object->setQuality(value - 0.1);
+    //    cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
+    //}
 
-    // option - increase quality of graphic rendering
-    else if (a_key == GLFW_KEY_H)
-    {
-        double value = object->getQuality();
-        object->setQuality(value + 0.1);
-        cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
-    }
+    //// option - increase quality of graphic rendering
+    //else if (a_key == GLFW_KEY_H)
+    //{
+    //    double value = object->getQuality();
+    //    object->setQuality(value + 0.1);
+    //    cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
+    //}
+
+
 
     // option - polygonize model and save to file
-    else if (a_key == GLFW_KEY_P)
+    else if (a_key == GLFW_KEY_M)
     {
         startPolygonize();
     }
@@ -1281,16 +1294,16 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         }
     }
 
-    // option - toggle vertical mirroring
-    else if (a_key == GLFW_KEY_M)
-    {
-        mirroredDisplay = !mirroredDisplay;
-        camera->setMirrorVertical(mirroredDisplay);
-    }
+    
     else if (a_key == GLFW_KEY_G)
     {
         object->setGhostEnabled(!object->getGhostEnabled());
     }
+
+    else if (a_key == GLFW_KEY_H)
+    {
+        toggleHaptics();
+	}
 
     else if (a_key == GLFW_KEY_KP_1)
     {
@@ -1336,23 +1349,20 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
 
     else if (a_key == GLFW_KEY_SPACE)
     {
-        object->setGhostEnabled(!object->getGhostEnabled());
+        toggleGhostMode();
     }
 
     //cout << cStr(rotationX) << "," << cStr(rotationY) << "," << cStr(rotationZ) << "," << "                            \r";
     // option - save voxel data to disk
-    else if (a_key == GLFW_KEY_S)
+    else if (a_key == GLFW_KEY_V)
     {
-        mutexObject.acquire();
-        image->saveToFiles("output/volumes/volume", "png");
-        mutexObject.release();
-        cout << "> Volume image saved to disk                       \r";
+        startExportVolume();
     }
+
     else if (a_key == GLFW_KEY_TAB)
     {
         isUILayerVisible = !isUILayerVisible;
         panel->setShowEnabled(isUILayerVisible);
-        toggleStatusMessage(isUILayerVisible, "Menu");
     }
 
     /*else if (a_key == GLFW_KEY_O)
@@ -1397,17 +1407,17 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
         // Check if button 2 was clicked
         else if (isPointInsideLabel(button2, xpos, ypos)) {
-            cout << "Button 2 clicked" << endl;
+            startPolygonize();
         }
 
         // Check if button 3 was clicked
         else if (isPointInsideLabel(button3, xpos, ypos)) {
-            cout << "Button 3 clicked" << endl;
+            startExportVolume();
         }
 
         // Check if button 4 was clicked
         else if (isPointInsideLabel(button4, xpos, ypos)) {
-            cout << "Button 4 clicked" << endl;
+            toggleHaptics();
         }
     }
 
@@ -1505,6 +1515,7 @@ void close(void)
     // delete resources
     delete hapticsThread;
     delete polyTaskThread;
+    delete exportVolumeThread;
     delete world;
     delete handler;
 }
@@ -1734,10 +1745,14 @@ void updateHaptics(void)
             state = HAPTIC_IDLE;
         }
 
-        tool[i]->computeInteractionForces();
+        if (isHapticsEnabled)
+        {
+            tool[i]->computeInteractionForces();
 
-        // send forces to haptic device
-        tool[i]->applyToDevice();
+            // send forces to haptic device
+            tool[i]->applyToDevice();
+		}
+        
 
     }
 
@@ -1771,7 +1786,7 @@ bool isPointInsidePanel(cPanel* panel, double x, double y)
 
 void startPolygonize()
 {
-    toggleStatusMessage(true, "Exporting Object...");
+    toggleStatusMessage(true, "Exporting Model...");
     glfwPollEvents();
     updateGraphics();
 
@@ -1784,13 +1799,13 @@ void polygonize()
     
 
     cMultiMesh* surface = new cMultiMesh;
-    object->polygonize(surface, 0.004, 0.004, 0.010);
+    object->polygonize(surface, 0.01, 0.01, 0.010);
     double SCALE = 0.1;
     double METERS_TO_MILLIMETERS = 1000.0;
     surface->scale(SCALE * METERS_TO_MILLIMETERS);
     surface->saveToFile("output/models/model.stl");
     toggleStatusMessage(false,"");
-    showStatusMessageForSeconds(3.0, "Object Exported");
+    showStatusMessageForSeconds(3.0, "Model Exported");
     delete surface;
 }
 
@@ -1834,4 +1849,58 @@ std::string selectFolder()
         return std::string(path);
     }
     return std::string();
+}
+
+void exportVolume()
+{
+    mutexObject.acquire();
+    image->saveToFiles("output/volumes/volume", "png");
+    mutexObject.release();
+    toggleStatusMessage(false, "");
+    showStatusMessageForSeconds(3.0, "Volume Exported");
+}
+
+void startExportVolume()
+{
+    toggleStatusMessage(true, "Exporting Volume...");
+    glfwPollEvents();
+    updateGraphics();
+
+    exportVolumeThread = new cThread();
+    exportVolumeThread->start(exportVolume, CTHREAD_PRIORITY_GRAPHICS);
+}
+
+void toggleGhostMode()
+{
+	object->setGhostEnabled(!object->getGhostEnabled());
+    if (object->getGhostEnabled())
+    {
+		button4->setText("(on) Ghost Mode (Space)");
+        button4->m_fontColor.setGreen();
+        toggleStatusMessage(true, "Ghost Mode (on)");
+	}
+    else
+    {
+		button4->setText("(off) Ghost Mode (Space)");
+        button4->m_fontColor.setWhite();
+        showStatusMessageForSeconds(3.0, "Ghost Mode (off)");
+	}
+}
+
+void toggleHaptics()
+{
+    if (isHapticsEnabled)
+    {
+		isHapticsEnabled = false;
+		button5->setText("(off) Haptics (H)");
+        toggleStatusMessage(true, "Haptics (off)");
+		button5->m_fontColor.setRed();
+	}
+    else
+    {
+		isHapticsEnabled = true;
+		button5->setText("(on) Haptics (H)");
+        showStatusMessageForSeconds(3.0, "Haptics (on)");
+		button5->m_fontColor.setWhite();
+	}
 }

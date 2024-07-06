@@ -1825,14 +1825,17 @@ void startPolygonize()
 
 void polygonize()
 {
-    
+    string path = selectFolder();
+
+    std::replace(path.begin(), path.end(), '\\', '/');
 
     cMultiMesh* surface = new cMultiMesh;
     object->polygonize(surface, 0.01, 0.01, 0.010);
     double SCALE = 0.1;
     double METERS_TO_MILLIMETERS = 1000.0;
     surface->scale(SCALE * METERS_TO_MILLIMETERS);
-    surface->saveToFile("output/models/model.stl");
+    //surface->saveToFile("output/models/model.stl");
+    surface->saveToFile(path + "/model.stl");
     toggleStatusMessage(false,"");
     showStatusMessageForSeconds(3.0, "Model Exported");
     delete surface;
@@ -1882,8 +1885,13 @@ std::string selectFolder()
 
 void exportVolume()
 {
+    string path = selectFolder();
+
+    std::replace(path.begin(), path.end(), '\\', '/');
+
     mutexObject.acquire();
-    image->saveToFiles("output/volumes/volume", "png");
+    //image->saveToFiles("output/volumes/volume", "png");
+    image->saveToFiles(path + "/volume", "png");
     mutexObject.release();
     toggleStatusMessage(false, "");
     showStatusMessageForSeconds(3.0, "Volume Exported");

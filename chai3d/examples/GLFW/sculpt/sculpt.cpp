@@ -331,6 +331,10 @@ void toggleGhostMode();
 
 void toggleHaptics();
 
+void createVoxelObject(cVoxelObject* object, string path, char* argv[]);
+
+void loadDataset();
+
 int main(int argc, char* argv[])
 {
     //--------------------------------------------------------------------------
@@ -698,151 +702,153 @@ int main(int argc, char* argv[])
     // create a volumetric model
     object = new cVoxelObject();
 
-    int sampleNumber = 1;
+    /*int sampleNumber = 1;*/
+//
+//
+//    object->setUseCulling(false, false);
+//    object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);              // % of maximum linear stiffness
+//
+//    //object->setGhostEnabled(true);
+//
+//
+//    // add object to world
+//    world->addChild(object);
+//
+//
+//
+//    // rotate object
+//    object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
+//
+//    // position object
+//    object->setLocalPos(-0.05, -0.05, 0.02);
+//
+//    // set the dimensions by assigning the position of the min and max corners
+//    /*object->m_minCorner.set(-0.25, -0.25, -0.25);
+//    object->m_maxCorner.set(0.25, 0.25, 0.25);*/
+//
+//    // set the dimensions by assigning the position of the min and max corners
+//    // Hand dataset
+//    object->m_minCorner.set(-0.5, -0.5, -0.65);
+//    object->m_maxCorner.set(0.5, 0.5, 0.65);
+//
+//
+//    //Value for fossil dataset dimensions
+//
+//    // set the texture coordinate at each corner.
+//    object->m_minTextureCoord.set(.0, 0.0, 0.0);
+//    object->m_maxTextureCoord.set(1.0, 1.0, 1.0);
+//
+//
+//    object->m_material->setStaticFriction(0.0);
+//    object->m_material->setDynamicFriction(0.4);
+//
+//    // enable materials
+//    object->setUseMaterial(true);
+//
+//    // set quality of graphic rendering
+//    object->setQuality(1);
+//
+//    object->setStiffness(maxStiffness, true);
+//
+//
+//    cShaderProgramPtr programShader = object->getShaderProgram();
+//
+//
+//    //--------------------------------------------------------------------------
+//    // LOAD VOXEL DATA
+//    //--------------------------------------------------------------------------
+//
+//    // create multi image
+//    image = cMultiImage::create();
+//
+//    string dataset = "tooth";
+//
+//    //std::string dataset = "tooth";
+//    std::string path;
+//#if defined(_MSVC)
+//    path = "resources/volumes/" + dataset + "/"; // Adjust path as necessary
+//# else
+//    path = RESOURCE_PATH("../resources/volumes/" + dataset + "/");
+//#endif
+//
+//    int countFiles = countFilesInDirectory(path, ".png");
+//
+//    int filesloaded = image->loadFromFiles("resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
+//    if (filesloaded == 0) {
+//#if defined(_MSVC)
+//        filesloaded = image->loadFromFiles("../resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
+//#endif
+//    }
+//
+//
+//
+//    if (filesloaded == 0) {
+//        cout << "Error - Failed to load volume data handXXXX.png." << endl;
+//        close();
+//        return -1;
+//    }
+//
+//
+//    // create texture
+//    texture = cTexture3d::create();
+//
+//    // assign volumetric image to texture
+//    texture->setImage(image);
+//
+//    // assign texture to voxel object
+//    object->setTexture(texture);
+//
+//    // initially select an isosurface corresponding to the bone/heart level
+//    object->setIsosurfaceValue(0.2);
+//
+//    // set optical density factor
+//    object->setOpticalDensity(1.2);
+//
+//    //--------------------------------------------------------------------------
+//    // LOAD COLORMAPS
+//    //--------------------------------------------------------------------------
+//
+//    boneLUT = cImage::create();
+//    bool fileLoaded = boneLUT->loadFromFile("resources/volumes/colormap_bone.png");
+//    if (!fileLoaded) {
+//#if defined(_MSVC)
+//        fileLoaded = boneLUT->loadFromFile("../resources/volumes/colormap_bone.png");
+//#endif
+//    }
+//    if (!fileLoaded)
+//    {
+//        cout << "Error - Failed to load colormap." << endl;
+//        close();
+//        return -1;
+//    }
+//
+//    softLUT = cImage::create();
+//    fileLoaded = softLUT->loadFromFile(RESOURCE_PATH("../resources/volumes/heart/colormap_soft.png"));
+//    if (!fileLoaded) {
+//#if defined(_MSVC)
+//        fileLoaded = softLUT->loadFromFile("../../../bin/resources/volumes/heart/colormap_soft.png");
+//#endif
+//    }
+//    if (!fileLoaded)
+//    {
+//        cout << "Error - Failed to load colormap." << endl;
+//        close();
+//        return -1;
+//    }
+//
+//    // tell the voxel object to load the colour look-up table as a texture
+//    object->m_colorMap->setImage(boneLUT);
+//
+//    object->setRenderingModeDVRColorMap();            // high quality
+//
+//    object->setShowEdges(false);
+//    object->clearAllEdges();
+//    object->clear();
+//    object->clearAllChildren();
+//    object->setUseLinearInterpolation(true);
+//
 
-
-    object->setUseCulling(false, false);
-    object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);              // % of maximum linear stiffness
-
-    //object->setGhostEnabled(true);
-
-
-    // add object to world
-    world->addChild(object);
-
-
-
-    // rotate object
-    object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-
-    // position object
-    object->setLocalPos(-0.05, -0.05, 0.02);
-
-    // set the dimensions by assigning the position of the min and max corners
-    /*object->m_minCorner.set(-0.25, -0.25, -0.25);
-    object->m_maxCorner.set(0.25, 0.25, 0.25);*/
-
-    // set the dimensions by assigning the position of the min and max corners
-    // Hand dataset
-    object->m_minCorner.set(-0.5, -0.5, -0.65);
-    object->m_maxCorner.set(0.5, 0.5, 0.65);
-
-
-    //Value for fossil dataset dimensions
-
-    // set the texture coordinate at each corner.
-    object->m_minTextureCoord.set(.0, 0.0, 0.0);
-    object->m_maxTextureCoord.set(1.0, 1.0, 1.0);
-
-
-    object->m_material->setStaticFriction(0.0);
-    object->m_material->setDynamicFriction(0.4);
-
-    // enable materials
-    object->setUseMaterial(true);
-
-    // set quality of graphic rendering
-    object->setQuality(1);
-
-    object->setStiffness(maxStiffness, true);
-
-
-    cShaderProgramPtr programShader = object->getShaderProgram();
-
-
-    //--------------------------------------------------------------------------
-    // LOAD VOXEL DATA
-    //--------------------------------------------------------------------------
-
-    // create multi image
-    image = cMultiImage::create();
-
-    string dataset = "tooth";
-
-    //std::string dataset = "tooth";
-    std::string path;
-#if defined(_MSVC)
-    path = "resources/volumes/" + dataset + "/"; // Adjust path as necessary
-# else
-    path = RESOURCE_PATH("../resources/volumes/" + dataset + "/");
-#endif
-
-    int countFiles = countFilesInDirectory(path, ".png");
-
-    int filesloaded = image->loadFromFiles("resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
-    if (filesloaded == 0) {
-#if defined(_MSVC)
-        filesloaded = image->loadFromFiles("../resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
-#endif
-    }
-
-
-
-    if (filesloaded == 0) {
-        cout << "Error - Failed to load volume data handXXXX.png." << endl;
-        close();
-        return -1;
-    }
-
-
-    // create texture
-    texture = cTexture3d::create();
-
-    // assign volumetric image to texture
-    texture->setImage(image);
-
-    // assign texture to voxel object
-    object->setTexture(texture);
-
-    // initially select an isosurface corresponding to the bone/heart level
-    object->setIsosurfaceValue(0.2);
-
-    // set optical density factor
-    object->setOpticalDensity(1.2);
-
-    //--------------------------------------------------------------------------
-    // LOAD COLORMAPS
-    //--------------------------------------------------------------------------
-
-    boneLUT = cImage::create();
-    bool fileLoaded = boneLUT->loadFromFile("resources/volumes/colormap_bone.png");
-    if (!fileLoaded) {
-#if defined(_MSVC)
-        fileLoaded = boneLUT->loadFromFile("../resources/volumes/colormap_bone.png");
-#endif
-    }
-    if (!fileLoaded)
-    {
-        cout << "Error - Failed to load colormap." << endl;
-        close();
-        return -1;
-    }
-
-    softLUT = cImage::create();
-    fileLoaded = softLUT->loadFromFile(RESOURCE_PATH("../resources/volumes/heart/colormap_soft.png"));
-    if (!fileLoaded) {
-#if defined(_MSVC)
-        fileLoaded = softLUT->loadFromFile("../../../bin/resources/volumes/heart/colormap_soft.png");
-#endif
-    }
-    if (!fileLoaded)
-    {
-        cout << "Error - Failed to load colormap." << endl;
-        close();
-        return -1;
-    }
-
-    // tell the voxel object to load the colour look-up table as a texture
-    object->m_colorMap->setImage(boneLUT);
-
-    object->setRenderingModeDVRColorMap();            // high quality
-
-    object->setShowEdges(false);
-    object->clearAllEdges();
-    object->clear();
-    object->clearAllChildren();
-    object->setUseLinearInterpolation(true);
-
+    //createVoxelObject(object, argv);
 
     /*for (int i = 0; i < numHapticDevices; i++)
     {
@@ -1272,6 +1278,12 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         startPolygonize();
     }
 
+    // option - load dataset
+    else if (a_key == GLFW_KEY_L)
+    {
+		loadDataset();
+	}
+
     // option - toggle fullscreen
     else if (a_key == GLFW_KEY_F)
     {
@@ -1409,7 +1421,8 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
         // Check if button 1 was clicked
         else if (isPointInsideLabel(button1, xpos, ypos)) {
-            selectFolder();
+            //selectFolder();
+            loadDataset();
         }
 
         // Check if button 2 was clicked
@@ -1918,5 +1931,162 @@ void toggleHaptics()
 		button5->setText("(on) Haptics (H)");
         showStatusMessageForSeconds(3.0, "Haptics (on)");
 		button5->m_fontColor.setWhite();
+	}
+}
+
+
+void createVoxelObject(cVoxelObject* object, string path, char* argv[])
+{
+    
+    rotationX = -23;
+    rotationY = 0;
+    rotationZ = 93;
+
+    object->setUseCulling(false, false);
+    object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);              // % of maximum linear stiffness
+    
+    //object->setGhostEnabled(true);
+    
+    
+    // add object to world
+    world->addChild(object);
+    
+    
+    
+    // rotate object
+    object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
+    
+    // position object
+    object->setLocalPos(-0.05, -0.05, 0.02);
+    
+    // set the dimensions by assigning the position of the min and max corners
+    /*object->m_minCorner.set(-0.25, -0.25, -0.25);
+    object->m_maxCorner.set(0.25, 0.25, 0.25);*/
+    
+    // set the dimensions by assigning the position of the min and max corners
+    // Hand dataset
+    object->m_minCorner.set(-0.5, -0.5, -0.65);
+    object->m_maxCorner.set(0.5, 0.5, 0.65);
+    
+    
+    //Value for fossil dataset dimensions
+    
+    // set the texture coordinate at each corner.
+    object->m_minTextureCoord.set(.0, 0.0, 0.0);
+    object->m_maxTextureCoord.set(1.0, 1.0, 1.0);
+    
+    
+    object->m_material->setStaticFriction(0.0);
+    object->m_material->setDynamicFriction(0.4);
+    
+    // enable materials
+    object->setUseMaterial(true);
+    
+    // set quality of graphic rendering
+    object->setQuality(1);
+    
+    object->setStiffness(maxStiffness, true);
+    
+    
+    cShaderProgramPtr programShader = object->getShaderProgram();
+    
+    
+    //--------------------------------------------------------------------------
+    // LOAD VOXEL DATA
+    //--------------------------------------------------------------------------
+    
+    // create multi image
+    image = cMultiImage::create();
+    
+    //string dataset = "tooth";
+    
+    //std::string dataset = "tooth";
+    //std::string path;
+
+    // Extract the substring after the last backslash
+    std::string dataset = path.substr(path.find_last_of('\\') + 1);
+
+#if defined(_MSVC)
+    //path = "resources/volumes/" + dataset + "/"; // Adjust path as necessary
+# else
+    path = RESOURCE_PATH("../resources/volumes/" + dataset + "/");
+#endif
+    
+    int countFiles = countFilesInDirectory(path, ".png");
+    
+    std::replace(path.begin(), path.end(), '\\', '/');
+
+    int filesloaded = image->loadFromFiles(path + "/" + dataset + "0", "png", countFiles);
+    if (filesloaded == 0) {
+#if defined(_MSVC)
+        filesloaded = image->loadFromFiles(path + "/" + dataset + "0", "png", countFiles);
+    
+#endif
+    }
+
+    if (filesloaded == 0) {
+        cout << "Error - Failed to load volume data." << endl;
+        close();
+        return;
+    }
+    
+    
+    // create texture
+    texture = cTexture3d::create();
+    
+    // assign volumetric image to texture
+    texture->setImage(image);
+    
+    // assign texture to voxel object
+    object->setTexture(texture);
+    
+    // initially select an isosurface corresponding to the bone/heart level
+    object->setIsosurfaceValue(0.2);
+    
+    // set optical density factor
+    object->setOpticalDensity(1.2);
+    
+    //--------------------------------------------------------------------------
+    // LOAD COLORMAPS
+    //--------------------------------------------------------------------------
+    
+    boneLUT = cImage::create();
+    bool fileLoaded = boneLUT->loadFromFile("resources/volumes/colormap_bone.png");
+    if (!fileLoaded) {
+#if defined(_MSVC)
+        fileLoaded = boneLUT->loadFromFile("../resources/volumes/colormap_bone.png");
+#endif
+    }
+    if (!fileLoaded)
+    {
+        cout << "Error - Failed to load colormap." << endl;
+        close();
+        return;
+    }
+    
+    
+    // tell the voxel object to load the colour look-up table as a texture
+    object->m_colorMap->setImage(boneLUT);
+    
+    object->setRenderingModeDVRColorMap();            // high quality
+    
+    object->setShowEdges(false);
+    object->clearAllEdges();
+    object->clear();
+    object->clearAllChildren();
+    object->setUseLinearInterpolation(true);
+
+}
+
+void loadDataset()
+{
+    string path = selectFolder();
+    if (path.empty())
+    {
+		return;
+	}
+    else
+    {
+		createVoxelObject(object, path, nullptr);
 	}
 }

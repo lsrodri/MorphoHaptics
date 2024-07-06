@@ -241,6 +241,7 @@ cLabel* button2;
 cLabel* button3;
 cLabel* button4;
 cLabel* button5;
+cLabel* button6;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -392,7 +393,7 @@ int main(int argc, char* argv[])
     }
 
     // create display context
-    window = glfwCreateWindow(w, h, "HapticMorph - Voxel Sculpting", NULL, NULL);
+    window = glfwCreateWindow(w, h, "MorphoHaptics - Voxel Sculpting", NULL, NULL);
     if (!window)
     {
         cout << "failed to create window" << endl;
@@ -928,6 +929,12 @@ int main(int argc, char* argv[])
     button5->setLocalPos(20, panel->getHeight() - 250); // Adjusted positions
     button5->setText("(on) Haptics (H)");
     button5->m_fontColor.setWhite();
+    
+    button6 = new cLabel(font);
+    panel->addChild(button6);
+    button6->setLocalPos(20, panel->getHeight() - 300); // Adjusted positions
+    button6->setText("Quit (Q)");
+    button6->m_fontColor.setWhite();
 
     // Create sandwich button to toggle panel visibility
     sandwichButton = new cPanel();
@@ -1417,8 +1424,17 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
         // Check if button 4 was clicked
         else if (isPointInsideLabel(button4, xpos, ypos)) {
+            toggleGhostMode();
+        }
+        
+        else if (isPointInsideLabel(button5, xpos, ypos)) {
             toggleHaptics();
         }
+        
+        else if (isPointInsideLabel(button6, xpos, ypos)) {
+            glfwSetWindowShouldClose(a_window, GLFW_TRUE);
+        }
+
     }
 
     if (a_button == GLFW_MOUSE_BUTTON_RIGHT && a_action == GLFW_PRESS)

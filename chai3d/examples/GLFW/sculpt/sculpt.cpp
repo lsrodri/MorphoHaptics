@@ -242,6 +242,9 @@ cLabel* button3;
 cLabel* button4;
 cLabel* button5;
 cLabel* button6;
+cLabel* button7;
+cLabel* button8;
+cLabel* button9;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -254,6 +257,13 @@ double statusPanelDisplayTime = 0.0;
 double statusMessageDisplayTime = 0.0;
 
 bool isHapticsEnabled = true;
+
+bool isSculptingEnabled = true;
+
+bool isVoxelValueHapticsEnabled = true;
+
+float averageVoxelLuminosity;
+
 
 //------------------------------------------------------------------------------
 // OCULUS RIFT
@@ -331,9 +341,19 @@ void toggleGhostMode();
 
 void toggleHaptics();
 
+void toggleSculpting();
+
+void toggleVirtualReality();
+
+float  calculateLuminosity(const cColorb& color);
+
+float getAverageLuminosity(cTexture3d* texture, int centerX, int centerY, int centerZ, int radius);
+
 void createVoxelObject(cVoxelObject* object, string path, char* argv[]);
 
 void loadDataset();
+
+void toggleVoxelValueHaptics();
 
 int main(int argc, char* argv[])
 {
@@ -341,20 +361,6 @@ int main(int argc, char* argv[])
     // INITIALIZATION
     //--------------------------------------------------------------------------
 
-    //cout << endl;
-    //cout << "-----------------------------------" << endl;
-    //cout << "Keyboard Options:" << endl << endl;
-    //cout << "[1] - View bones" << endl;
-    //cout << "[2] - View hand" << endl;
-    //cout << "[4,5] Adjust slicing along X axis" << endl;
-    //cout << "[6,7] Adjust slicing along Y axis" << endl;
-    //cout << "[8,9] Adjust slicing along Z axis" << endl;
-    //cout << "[l,h] Adjust quality of graphic rendering" << endl;
-    //cout << "[p] - Polygonize model and save to file (.stl)" << endl;
-    //cout << "[f] - Enable/Disable full screen mode" << endl;
-    //cout << "[m] - Enable/Disable vertical mirroring" << endl;
-    //cout << "[q] - Exit application" << endl;
-    //cout << endl << endl;
 
     // parse first arg to try and locate resources
     string resourceRoot = string(argv[0]).substr(0, string(argv[0]).find_last_of("/\\") + 1);
@@ -519,7 +525,7 @@ int main(int argc, char* argv[])
         if (!fileload)
         {
 #if defined(_MSVC)
-            fileload = drills[i]->loadFromFile("resources/models/drill.3ds");
+            fileload = drills[i]->loadFromFile("../../resources/models/drill.3ds");
 #endif
         }
         if (!fileload)
@@ -897,7 +903,7 @@ int main(int argc, char* argv[])
     panel = new cPanel();
     camera->m_frontLayer->addChild(panel);
     panel->setLocalPos(10, 0);
-    panel->setSize(190, height - 50); // Adjust width and height
+    panel->setSize(210, height - 70); // Adjust width and height
     panel->setCornerRadius(10, 10, 10, 10);
     panel->setTransparencyLevel(0.5);
     panel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
@@ -938,9 +944,27 @@ int main(int argc, char* argv[])
     
     button6 = new cLabel(font);
     panel->addChild(button6);
-    button6->setLocalPos(20, panel->getHeight() - 300); // Adjusted positions
+    button6->setLocalPos(20, panel->getHeight() - 450); // Adjusted positions
     button6->setText("Quit (Q)");
     button6->m_fontColor.setWhite();
+    
+    button7 = new cLabel(font);
+    panel->addChild(button7);
+    button7->setLocalPos(20, panel->getHeight() - 300); // Adjusted positions
+    button7->setText("(on) Sculpting (S)");
+    button7->m_fontColor.setWhite();
+    
+    button8 = new cLabel(font);
+    panel->addChild(button8);
+    button8->setLocalPos(20, panel->getHeight() - 350); // Adjusted positions
+    button8->setText("(off) Virtual Reality (R)");
+    button8->m_fontColor.setWhite();
+
+	button9 = new cLabel(font);
+    panel->addChild(button9);
+    button9->setLocalPos(20, panel->getHeight() - 400); // Adjusted positions
+    button9->setText("(on) Voxel-Value Haptics (K)");
+    button9->m_fontColor.setWhite();
 
     // Create sandwich button to toggle panel visibility
     sandwichButton = new cPanel();
@@ -974,6 +998,7 @@ int main(int argc, char* argv[])
     // START SIMULATION
     //--------------------------------------------------------------------------
 
+    // create a thread which starts the main haptics rendering loop
     // create a thread which starts the main haptics rendering loop
     hapticsThread = new cThread();
     hapticsThread->start(updateHaptics, CTHREAD_PRIORITY_HAPTICS);
@@ -1324,6 +1349,22 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         toggleHaptics();
 	}
 
+    else if (a_key == GLFW_KEY_S)
+    {
+		toggleSculpting();
+	}
+
+    else if (a_key == GLFW_KEY_R)
+    {
+		toggleVirtualReality();
+	}
+
+    else if (a_key == GLFW_KEY_K)
+    {
+		toggleVoxelValueHaptics();
+	}
+    
+
     else if (a_key == GLFW_KEY_KP_1)
     {
         rotationX = rotationX - 1;
@@ -1448,6 +1489,18 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
             glfwSetWindowShouldClose(a_window, GLFW_TRUE);
         }
 
+        else if (isPointInsideLabel(button7, xpos, ypos)) {
+            toggleSculpting();
+        }
+
+        else if (isPointInsideLabel(button8, xpos, ypos)) {
+            toggleVirtualReality();
+        }
+
+        else if (isPointInsideLabel(button9, xpos, ypos)) {
+			toggleVoxelValueHaptics();
+		}
+
     }
 
     if (a_button == GLFW_MOUSE_BUTTON_RIGHT && a_action == GLFW_PRESS)
@@ -1486,9 +1539,6 @@ void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY)
         //// assign new angles
         camera->setSphericalAzimuthDeg(azimuthDeg);
         camera->setSphericalPolarDeg(polarDeg);
-
-        cout << azimuthDeg << endl;
-        cout << polarDeg << endl;
 
         for (int i = 0; i < numHapticDevices; i++)
         {
@@ -1677,7 +1727,7 @@ void updateHaptics(void)
             tool[toolTwo]->computeInteractionForces();
 
             // check if tool is in contact with voxel object
-            if (tool[toolTwo]->isInContact(object) && (userSwitches > 0))
+            if (tool[toolTwo]->isInContact(object) && (userSwitches > 0) && isSculptingEnabled)
             {
                 // retrieve contact event
                 cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
@@ -1692,6 +1742,18 @@ void updateHaptics(void)
                 mutexVoxel.release();
                 flagMarkVolumeForUpdate = true;
             }
+
+            if (tool[toolTwo]->isInContact(object) && isVoxelValueHapticsEnabled)
+            {
+				// retrieve contact event
+				cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
+
+				object->m_texture->m_image->getVoxelColor(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, voxelColor);
+
+                //averageVoxelLuminosity = getAverageLuminosity(object->m_texture->m_image, contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, 64);
+                averageVoxelLuminosity = getAverageLuminosity(texture.get(), contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, 9);
+
+			}
 
             // release mutex
             mutexObject.release();
@@ -1777,6 +1839,25 @@ void updateHaptics(void)
         if (isHapticsEnabled)
         {
             tool[i]->computeInteractionForces();
+
+            if (isVoxelValueHapticsEnabled)
+            {
+
+                cVector3d force = tool[i]->getDeviceGlobalForce();
+
+                double threshold = 1e-6; // A small threshold value
+                if (force.length() > threshold) {
+
+                    // Calculate luminosity
+                    //float luminosity = calculateLuminosity(voxelColor);
+
+                    //force.mul(luminosity);
+                    force.mul(averageVoxelLuminosity);
+
+                    tool[i]->setDeviceGlobalForce(force);
+                }
+
+            }
 
             // send forces to haptic device
             tool[i]->applyToDevice();
@@ -2096,5 +2177,87 @@ void loadDataset()
     else
     {
 		createVoxelObject(object, path, nullptr);
+	}
+}
+
+void toggleSculpting()
+{
+    if (isSculptingEnabled)
+    {
+		isSculptingEnabled = false;
+		button7->setText("(off) Sculpting (S)");
+		toggleStatusMessage(true, "Sculpting (off)");
+        button7->m_fontColor.setRed();
+	}
+    else
+    {
+		isSculptingEnabled = true;
+        button7->setText("(on) Sculpting (S)");
+		showStatusMessageForSeconds(3.0, "Sculpting (on)");
+        button7->m_fontColor.setWhite();
+	}
+}
+
+void toggleVirtualReality()
+{
+
+}
+
+// Function to calculate luminosity including alpha to reduce the effect of fully transparent colors
+float calculateLuminosity(const cColorb& color) {
+    // Normalize the RGB components to floats
+    float R = color.getR() / 255.0f;
+    float G = color.getG() / 255.0f;
+    float B = color.getB() / 255.0f;
+    float A = color.getA() / 255.0f; // Normalize alpha component to float
+
+    // Calculate luminosity with alpha consideration
+    float luminosity = (0.2126f * R + 0.7152f * G + 0.0722f * B) * A; // Multiply by alpha to reduce luminosity for transparent colors
+
+    return luminosity;
+}
+
+float getAverageLuminosity(cTexture3d* texture, int centerX, int centerY, int centerZ, int radius) {
+    std::vector<float> luminosities;
+    int voxelCount = 0;
+    for (int x = centerX - radius; x <= centerX + radius; ++x) {
+        for (int y = centerY - radius; y <= centerY + radius; ++y) {
+            for (int z = centerZ - radius; z <= centerZ + radius; ++z) {
+                // Check if the voxel is within the bounds of the texture
+                if (x >= 0 && x < texture->m_image->getWidth() &&
+                    y >= 0 && y < texture->m_image->getHeight() &&
+                    z >= 0 && z < texture->m_image->getImageCount()) {
+                    cColorb voxelColor;
+                    texture->m_image->getVoxelColor(x, y, z, voxelColor);
+                    luminosities.push_back(calculateLuminosity(voxelColor));
+                    ++voxelCount;
+                }
+            }
+        }
+    }
+
+    // Calculate the average luminosity
+    float totalLuminosity = 0;
+    for (float luminosity : luminosities) {
+        totalLuminosity += luminosity;
+    }
+    return voxelCount > 0 ? totalLuminosity / voxelCount : 0;
+}
+
+void toggleVoxelValueHaptics()
+{
+    if (isVoxelValueHapticsEnabled)
+    {
+		isVoxelValueHapticsEnabled = false;
+		button9->setText("(off) Voxel-Value Haptics (K)");
+		toggleStatusMessage(true, "Voxel-Value Haptics (off)");
+		button9->m_fontColor.setRed();
+	}
+    else
+    {
+		isVoxelValueHapticsEnabled = true;
+		button9->setText("(on) Voxel-Value Haptics (K)");
+		showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
+		button9->m_fontColor.setWhite();
 	}
 }

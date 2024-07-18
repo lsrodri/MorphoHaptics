@@ -245,6 +245,7 @@ cLabel* button6;
 cLabel* button7;
 cLabel* button8;
 cLabel* button9;
+cLabel* button10;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -264,20 +265,7 @@ bool isVoxelValueHapticsEnabled = true;
 
 float averageVoxelLuminosity;
 
-
-//------------------------------------------------------------------------------
-// OCULUS RIFT
-//------------------------------------------------------------------------------
-
-// display context
-//cOVRRenderContext renderContext;
-
-// oculus device
-//cOVRDevice oculusVR;
-
-// added VR toggle
-boolean renderVR = false;
-
+float toolRadius = 0.04;
 
 //------------------------------------------------------------------------------
 // DECLARED MACROS
@@ -354,6 +342,8 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[]);
 void loadDataset();
 
 void toggleVoxelValueHaptics();
+
+void updateProbeRadius(int value);
 
 int main(int argc, char* argv[])
 {
@@ -652,7 +642,7 @@ int main(int argc, char* argv[])
         //tool[i]->setWorkspaceRadius(0.55);
 
         // define a radius for the virtual tool (sphere)
-        tool[i]->setRadius(0.04);
+        tool[i]->setRadius(toolRadius);
 
         // map the physical workspace of the haptic device to a larger virtual workspace.
         tool[i]->setWorkspaceRadius(0.5);
@@ -708,158 +698,6 @@ int main(int argc, char* argv[])
     // create a volumetric model
     object = new cVoxelObject();
 
-    /*int sampleNumber = 1;*/
-//
-//
-//    object->setUseCulling(false, false);
-//    object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);              // % of maximum linear stiffness
-//
-//    //object->setGhostEnabled(true);
-//
-//
-//    // add object to world
-//    world->addChild(object);
-//
-//
-//
-//    // rotate object
-//    object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-//
-//    // position object
-//    object->setLocalPos(-0.05, -0.05, 0.02);
-//
-//    // set the dimensions by assigning the position of the min and max corners
-//    /*object->m_minCorner.set(-0.25, -0.25, -0.25);
-//    object->m_maxCorner.set(0.25, 0.25, 0.25);*/
-//
-//    // set the dimensions by assigning the position of the min and max corners
-//    // Hand dataset
-//    object->m_minCorner.set(-0.5, -0.5, -0.65);
-//    object->m_maxCorner.set(0.5, 0.5, 0.65);
-//
-//
-//    //Value for fossil dataset dimensions
-//
-//    // set the texture coordinate at each corner.
-//    object->m_minTextureCoord.set(.0, 0.0, 0.0);
-//    object->m_maxTextureCoord.set(1.0, 1.0, 1.0);
-//
-//
-//    object->m_material->setStaticFriction(0.0);
-//    object->m_material->setDynamicFriction(0.4);
-//
-//    // enable materials
-//    object->setUseMaterial(true);
-//
-//    // set quality of graphic rendering
-//    object->setQuality(1);
-//
-//    object->setStiffness(maxStiffness, true);
-//
-//
-//    cShaderProgramPtr programShader = object->getShaderProgram();
-//
-//
-//    //--------------------------------------------------------------------------
-//    // LOAD VOXEL DATA
-//    //--------------------------------------------------------------------------
-//
-//    // create multi image
-//    image = cMultiImage::create();
-//
-//    string dataset = "tooth";
-//
-//    //std::string dataset = "tooth";
-//    std::string path;
-//#if defined(_MSVC)
-//    path = "resources/volumes/" + dataset + "/"; // Adjust path as necessary
-//# else
-//    path = RESOURCE_PATH("../resources/volumes/" + dataset + "/");
-//#endif
-//
-//    int countFiles = countFilesInDirectory(path, ".png");
-//
-//    int filesloaded = image->loadFromFiles("resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
-//    if (filesloaded == 0) {
-//#if defined(_MSVC)
-//        filesloaded = image->loadFromFiles("../resources/volumes/" + dataset + "/" + dataset + "0", "png", countFiles);
-//#endif
-//    }
-//
-//
-//
-//    if (filesloaded == 0) {
-//        cout << "Error - Failed to load volume data handXXXX.png." << endl;
-//        close();
-//        return -1;
-//    }
-//
-//
-//    // create texture
-//    texture = cTexture3d::create();
-//
-//    // assign volumetric image to texture
-//    texture->setImage(image);
-//
-//    // assign texture to voxel object
-//    object->setTexture(texture);
-//
-//    // initially select an isosurface corresponding to the bone/heart level
-//    object->setIsosurfaceValue(0.2);
-//
-//    // set optical density factor
-//    object->setOpticalDensity(1.2);
-//
-//    //--------------------------------------------------------------------------
-//    // LOAD COLORMAPS
-//    //--------------------------------------------------------------------------
-//
-//    boneLUT = cImage::create();
-//    bool fileLoaded = boneLUT->loadFromFile("resources/volumes/colormap_bone.png");
-//    if (!fileLoaded) {
-//#if defined(_MSVC)
-//        fileLoaded = boneLUT->loadFromFile("../resources/volumes/colormap_bone.png");
-//#endif
-//    }
-//    if (!fileLoaded)
-//    {
-//        cout << "Error - Failed to load colormap." << endl;
-//        close();
-//        return -1;
-//    }
-//
-//    softLUT = cImage::create();
-//    fileLoaded = softLUT->loadFromFile(RESOURCE_PATH("../resources/volumes/heart/colormap_soft.png"));
-//    if (!fileLoaded) {
-//#if defined(_MSVC)
-//        fileLoaded = softLUT->loadFromFile("../../../bin/resources/volumes/heart/colormap_soft.png");
-//#endif
-//    }
-//    if (!fileLoaded)
-//    {
-//        cout << "Error - Failed to load colormap." << endl;
-//        close();
-//        return -1;
-//    }
-//
-//    // tell the voxel object to load the colour look-up table as a texture
-//    object->m_colorMap->setImage(boneLUT);
-//
-//    object->setRenderingModeDVRColorMap();            // high quality
-//
-//    object->setShowEdges(false);
-//    object->clearAllEdges();
-//    object->clear();
-//    object->clearAllChildren();
-//    object->setUseLinearInterpolation(true);
-//
-
-    //createVoxelObject(object, argv);
-
-    /*for (int i = 0; i < numHapticDevices; i++)
-    {
-        world->addChild(tool[i]);
-    }*/
 
     //--------------------------------------------------------------------------
     // WIDGETS
@@ -944,7 +782,7 @@ int main(int argc, char* argv[])
     
     button6 = new cLabel(font);
     panel->addChild(button6);
-    button6->setLocalPos(20, panel->getHeight() - 450); // Adjusted positions
+    button6->setLocalPos(20, panel->getHeight() - 500); // Adjusted positions
     button6->setText("Quit (Q)");
     button6->m_fontColor.setWhite();
     
@@ -953,18 +791,24 @@ int main(int argc, char* argv[])
     button7->setLocalPos(20, panel->getHeight() - 300); // Adjusted positions
     button7->setText("(on) Sculpting (S)");
     button7->m_fontColor.setWhite();
-    
-    button8 = new cLabel(font);
+
+	button8 = new cLabel(font);
     panel->addChild(button8);
     button8->setLocalPos(20, panel->getHeight() - 350); // Adjusted positions
-    button8->setText("(off) Virtual Reality (R)");
+    button8->setText("(on) Voxel-Value Haptics (K)");
     button8->m_fontColor.setWhite();
-
-	button9 = new cLabel(font);
+    
+    button9 = new cLabel(font);
     panel->addChild(button9);
     button9->setLocalPos(20, panel->getHeight() - 400); // Adjusted positions
-    button9->setText("(on) Voxel-Value Haptics (K)");
+    button9->setText("Increase Probe Radius (+)");
     button9->m_fontColor.setWhite();
+
+	button10 = new cLabel(font);
+    panel->addChild(button10);
+    button10->setLocalPos(20, panel->getHeight() - 450); // Adjusted positions
+    button10->setText("Decrease Probe Radius (-)");
+    button10->m_fontColor.setWhite();
 
     // Create sandwich button to toggle panel visibility
     sandwichButton = new cPanel();
@@ -1121,14 +965,7 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     // Lucas: added isosurface changes
     else if (a_key == GLFW_KEY_UP)
     {
-        /*if (stiffnessMultiplier < 1)
-        {
-            stiffnessMultiplier += 0.1;
-            object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);
-        }*/
-
-        //cout << "> Stiffness set to " << cStr(stiffnessMultiplier, 3) << "                            \r";
-
+        
         cVector3d currentPosition = object->getLocalPos();
 
         //// Add 0.1 to the X-axis component
@@ -1425,6 +1262,16 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         panel->setShowEnabled(isUILayerVisible);
     }
 
+    else if (a_key == GLFW_KEY_EQUAL || a_key == GLFW_KEY_KP_ADD)
+    {
+		updateProbeRadius(1);
+	}
+
+    else if (a_key == GLFW_KEY_MINUS || a_key == GLFW_KEY_KP_SUBTRACT)
+    {
+		updateProbeRadius(-1);
+	}
+
     /*else if (a_key == GLFW_KEY_O)
     {
         toolOne = 0;
@@ -1494,12 +1341,16 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
         }
 
         else if (isPointInsideLabel(button8, xpos, ypos)) {
-            toggleVirtualReality();
+            toggleVoxelValueHaptics();
         }
-
+        
         else if (isPointInsideLabel(button9, xpos, ypos)) {
-			toggleVoxelValueHaptics();
-		}
+            updateProbeRadius(1);
+        }
+        
+        else if (isPointInsideLabel(button10, xpos, ypos)) {
+            updateProbeRadius(-1);
+        }
 
     }
 
@@ -2249,15 +2100,34 @@ void toggleVoxelValueHaptics()
     if (isVoxelValueHapticsEnabled)
     {
 		isVoxelValueHapticsEnabled = false;
-		button9->setText("(off) Voxel-Value Haptics (K)");
+		button8->setText("(off) Voxel-Value Haptics (K)");
 		toggleStatusMessage(true, "Voxel-Value Haptics (off)");
-		button9->m_fontColor.setRed();
+		button8->m_fontColor.setRed();
 	}
     else
     {
 		isVoxelValueHapticsEnabled = true;
-		button9->setText("(on) Voxel-Value Haptics (K)");
+		button8->setText("(on) Voxel-Value Haptics (K)");
 		showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
-		button9->m_fontColor.setWhite();
+		button8->m_fontColor.setWhite();
 	}
+}
+
+void updateProbeRadius(int value)
+{
+    if (toolRadius <= 0.023 && value == -1)
+    {
+        showStatusMessageForSeconds(3.0, "Minimum Probe Size Reached");
+		return;
+	}
+    if (toolRadius >= 0.06 && value == 1)
+    {
+		showStatusMessageForSeconds(3.0, "Maximum Probe Size Reached");
+        return;
+    }
+
+    // value can be 1 or -1, so this will increase or decrease the radius by 0.001
+    toolRadius += 0.001 * value;
+    tool[0]->setRadius(toolRadius);
+    cout << "> Probe radius set to " << cStr(toolRadius, 3) << "                            \r";
 }

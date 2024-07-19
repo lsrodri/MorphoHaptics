@@ -276,7 +276,8 @@ int textureHeight;
 int textureDepth;
 
 // Number of voxels included in the calculation of the average luminosity for voxel value haptics
-int valueHapticsRadius = 22;
+int valueHapticsRadius = 16;
+float previousLuminosity = 0.0f;
 
 //------------------------------------------------------------------------------
 // DECLARED MACROS
@@ -355,6 +356,8 @@ void loadDataset();
 void toggleVoxelValueHaptics();
 
 void updateProbeRadius(int value);
+
+float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor);
 
 int main(int argc, char* argv[])
 {
@@ -1585,7 +1588,16 @@ void updateHaptics(void)
                 // retrieve contact event
                 cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
 
-                averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+                //averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+
+                // Calculate new luminosity
+                float newLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+
+                // Smooth the luminosity value
+                averageVoxelLuminosity = smoothAverageLuminosity(newLuminosity, previousLuminosity, 0.1f);
+
+                // Update the previous luminosity for the next iteration
+                previousLuminosity = averageVoxelLuminosity;
 
                 cVector3d force = tool[i]->getDeviceGlobalForce();
 
@@ -2123,4 +2135,9 @@ void updateProbeRadius(int value)
     toolRadius += 0.001 * value;
     tool[0]->setRadius(toolRadius);
     cout << "> Probe radius set to " << cStr(toolRadius, 3) << "                            \r";
+}
+
+// Smoothing function
+float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor = 0.1f) {
+    return previousLuminosity * (1.0f - smoothingFactor) + newLuminosity * smoothingFactor;
 }

@@ -267,7 +267,7 @@ bool isVoxelValueHapticsEnabled = true;
 
 float averageVoxelLuminosity;
 
-float toolRadius = 0.04;
+float toolRadius = 0.023;
 
 cColorb color(0x00, 0x00, 0x00, 0x00);
 
@@ -1687,15 +1687,14 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     object->m_maxCorner.set(0.25, 0.25, 0.25);*/
     
     // set the dimensions by assigning the position of the min and max corners
-    // Hand dataset
-    object->m_minCorner.set(-0.5, -0.5, -0.5);
-    object->m_maxCorner.set(0.5, 0.5, 0.5);
+    //object->m_minCorner.set(-0.5, -0.5, -0.5);
+    //object->m_maxCorner.set(0.5, 0.5, 0.5);
     
     
     //Value for fossil dataset dimensions
     
     // set the texture coordinate at each corner.
-    object->m_minTextureCoord.set(.0, 0.0, 0.0);
+    object->m_minTextureCoord.set(0, 0, 0);
     object->m_maxTextureCoord.set(1.0, 1.0, 1.0);
     
     
@@ -1773,6 +1772,15 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     textureWidth = texture->m_image->getWidth();
     textureHeight = texture->m_image->getHeight();
     textureDepth = texture->m_image->getImageCount();
+
+    // Calculating the scale factors for width, height, and depth
+    float widthScale = static_cast<float>(textureWidth) / textureWidth;
+    float heightScale = static_cast<float>(textureHeight) / textureWidth;
+    float depthScale = static_cast<float>(textureDepth) / textureWidth;
+
+    // Setting the minCorner and maxCorner values
+    object->m_minCorner.set(-0.5 * widthScale, -0.5 * heightScale, -0.5 * depthScale);
+    object->m_maxCorner.set(0.5 * widthScale, 0.5 * heightScale, 0.5 * depthScale);
     
     //--------------------------------------------------------------------------
     // LOAD COLORMAPS

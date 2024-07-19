@@ -267,6 +267,17 @@ float averageVoxelLuminosity;
 
 float toolRadius = 0.04;
 
+cColorb color(0x00, 0x00, 0x00, 0x00);
+
+bool debugging = true;
+
+int textureWidth;
+int textureHeight;
+int textureDepth;
+
+// Number of voxels included in the calculation of the average luminosity for voxel value haptics
+int valueHapticsRadius = 22;
+
 //------------------------------------------------------------------------------
 // DECLARED MACROS
 //------------------------------------------------------------------------------
@@ -335,7 +346,7 @@ void toggleVirtualReality();
 
 float  calculateLuminosity(const cColorb& color);
 
-float getAverageLuminosity(cTexture3d* texture, int centerX, int centerY, int centerZ, int radius);
+float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius);
 
 void createVoxelObject(cVoxelObject* object, string path, char* argv[]);
 
@@ -711,7 +722,7 @@ int main(int argc, char* argv[])
     //camera->m_frontLayer->addChild(labelRates);
 
     // set font color
-    //labelRates->m_fontColor.setWhite();
+    labelRates->m_fontColor.setWhite();
 
     // create a small message
     labelMessage = new cLabel(font);
@@ -810,6 +821,10 @@ int main(int argc, char* argv[])
     button10->setText("Decrease Probe Radius (-)");
     button10->m_fontColor.setWhite();
 
+    // Displaying it inside the menu to avoid overlapping with system status panel
+    panel->addChild(labelRates);
+    labelRates->setLocalPos(20, 20);
+
     // Create sandwich button to toggle panel visibility
     sandwichButton = new cPanel();
     camera->m_frontLayer->addChild(sandwichButton);
@@ -819,16 +834,6 @@ int main(int argc, char* argv[])
     sandwichButton->setTexture(sandwichIcon);
     sandwichButton->setUseTexture(true);
 
-    //// Create a system status panel
-    //statusPanel = new cPanel();
-    //camera->m_frontLayer->addChild(statusPanel);
-    //statusPanel->setSize(200, 50); // Adjust width and height
-    //statusPanel->setCornerRadius(10, 10, 10, 10);
-    //statusPanel->setLocalPos((int)(0.5 * (width - statusPanel->getWidth())), 40);
-    //statusPanel->setTransparencyLevel(0.5);
-    //statusPanel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
-    //statusPanel->setShowEnabled(isStatusPanelVisible);
-
     statusMessage = new cLabel(font);
     camera->m_frontLayer->addChild(statusMessage);
     statusMessage->m_fontColor.setWhite();
@@ -837,6 +842,12 @@ int main(int argc, char* argv[])
     // Center the status message horizontally
     statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
     statusMessage->setShowEnabled(isStatusMessageVisible);
+
+    // Added for development purposes
+    if (debugging) {
+        // Skipping the need to manually load the dataset during development
+        createVoxelObject(object, "resources\\volumes\\tooth", argv);
+    }
 
     //--------------------------------------------------------------------------
     // START SIMULATION
@@ -1309,7 +1320,6 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
         // Check if button 1 was clicked
         else if (isPointInsideLabel(button1, xpos, ypos)) {
-            //selectFolder();
             loadDataset();
         }
 
@@ -1473,8 +1483,8 @@ void updateGraphics(void)
     //labelMessage->setText(cStr(position.get(0)));
 
     // update haptic and graphic rate data
-    //labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
-        //cStr(freqCounterHaptics.getFrequency(), 0) + " Hz");
+    labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
+        cStr(freqCounterHaptics.getFrequency(), 0) + " Hz");
 
     /////////////////////////////////////////////////////////////////////
     // VOLUME UPDATE
@@ -1535,6 +1545,10 @@ void updateHaptics(void)
     bool flagStart = true;
     int counter = 0;
 
+    // A small threshold value to avoid calculating voxel-value haptics with zero forces
+    double threshold = 1e-6; 
+    int i = 0;
+
     // simulation in now running
     simulationRunning = true;
     simulationFinished = false;
@@ -1553,38 +1567,52 @@ void updateHaptics(void)
 
         // compute global reference frames for each object
         world->computeGlobalPositions(true);
-
-        /*for (int i = 0; i < numHapticDevices; i++)
-        {*/
-        int i = 0;
+        
         // update position and orientation of tool
         tool[i]->updateFromDevice();
 
         hapticDevice[i]->getPosition(position);
 
-        //tool[i]->computeInteractionForces();
+        // read user switch
+        bool isFrontButtonPressed = tool[toolOne]->getUserSwitch(0);
 
-        //// send forces to haptic device
-        //tool[i]->applyToDevice();
-    //}
-
-    // read user switch
-        int userSwitches = tool[toolTwo]->getUserSwitches();
-
-        // acquire mutex
-        if (mutexObject.tryAcquire())
+        if (isHapticsEnabled)
         {
-            // compute interaction forces
-            tool[toolTwo]->computeInteractionForces();
+            tool[i]->computeInteractionForces();
 
-            // check if tool is in contact with voxel object
-            if (tool[toolTwo]->isInContact(object) && (userSwitches > 0) && isSculptingEnabled)
+            if (tool[toolTwo]->isInContact(object) && isVoxelValueHapticsEnabled)
             {
                 // retrieve contact event
                 cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
 
+                averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+
+                cVector3d force = tool[i]->getDeviceGlobalForce();
+
+                if (force.length() > threshold) {
+
+                    force.mul(averageVoxelLuminosity);
+
+                    tool[i]->setDeviceGlobalForce(force);
+                }
+
+            }
+
+            // send forces to haptic device
+            tool[i]->applyToDevice();
+        }
+
+        // acquire mutex
+        if (mutexObject.tryAcquire())
+        {
+
+            // retrieve contact event
+            cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
+
+            // check if tool is in contact with voxel object
+            if (tool[toolTwo]->isInContact(object) && isFrontButtonPressed && isSculptingEnabled)
+            {
                 // update voxel color
-                cColorb color(0x00, 0x00, 0x00, 0x00);
                 object->m_texture->m_image->setVoxelColor(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, color);
 
                 // mark voxel for update
@@ -1594,21 +1622,11 @@ void updateHaptics(void)
                 flagMarkVolumeForUpdate = true;
             }
 
-            if (tool[toolTwo]->isInContact(object) && isVoxelValueHapticsEnabled)
-            {
-				// retrieve contact event
-				cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
-
-				object->m_texture->m_image->getVoxelColor(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, voxelColor);
-
-                //averageVoxelLuminosity = getAverageLuminosity(object->m_texture->m_image, contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, 64);
-                averageVoxelLuminosity = getAverageLuminosity(texture.get(), contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, 9);
-
-			}
-
             // release mutex
             mutexObject.release();
         }
+
+        
 
         /////////////////////////////////////////////////////////////////////////
         // MANIPULATION
@@ -1687,32 +1705,7 @@ void updateHaptics(void)
             state = HAPTIC_IDLE;
         }
 
-        if (isHapticsEnabled)
-        {
-            tool[i]->computeInteractionForces();
-
-            if (isVoxelValueHapticsEnabled)
-            {
-
-                cVector3d force = tool[i]->getDeviceGlobalForce();
-
-                double threshold = 1e-6; // A small threshold value
-                if (force.length() > threshold) {
-
-                    // Calculate luminosity
-                    //float luminosity = calculateLuminosity(voxelColor);
-
-                    //force.mul(luminosity);
-                    force.mul(averageVoxelLuminosity);
-
-                    tool[i]->setDeviceGlobalForce(force);
-                }
-
-            }
-
-            // send forces to haptic device
-            tool[i]->applyToDevice();
-		}
+        
         
 
     }
@@ -1905,8 +1898,8 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     
     // set the dimensions by assigning the position of the min and max corners
     // Hand dataset
-    object->m_minCorner.set(-0.5, -0.5, -0.65);
-    object->m_maxCorner.set(0.5, 0.5, 0.65);
+    object->m_minCorner.set(-0.5, -0.5, -0.75);
+    object->m_maxCorner.set(0.5, 0.5, 0.75);
     
     
     //Value for fossil dataset dimensions
@@ -1985,6 +1978,11 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     
     // set optical density factor
     object->setOpticalDensity(1.2);
+
+    // setting the texture's dimensions for other calculations
+    textureWidth = texture->m_image->getWidth();
+    textureHeight = texture->m_image->getHeight();
+    textureDepth = texture->m_image->getImageCount();
     
     //--------------------------------------------------------------------------
     // LOAD COLORMAPS
@@ -2021,6 +2019,7 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
 void loadDataset()
 {
     string path = selectFolder();
+    cout << path << endl;
     if (path.empty())
     {
 		return;
@@ -2068,30 +2067,24 @@ float calculateLuminosity(const cColorb& color) {
     return luminosity;
 }
 
-float getAverageLuminosity(cTexture3d* texture, int centerX, int centerY, int centerZ, int radius) {
-    std::vector<float> luminosities;
+float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius) {
     int voxelCount = 0;
+    float totalLuminosity = 0;
+
     for (int x = centerX - radius; x <= centerX + radius; ++x) {
         for (int y = centerY - radius; y <= centerY + radius; ++y) {
             for (int z = centerZ - radius; z <= centerZ + radius; ++z) {
                 // Check if the voxel is within the bounds of the texture
-                if (x >= 0 && x < texture->m_image->getWidth() &&
-                    y >= 0 && y < texture->m_image->getHeight() &&
-                    z >= 0 && z < texture->m_image->getImageCount()) {
+                if (x >= 0 && x < textureWidth && y >= 0 && y < textureHeight && z >= 0 && z < textureDepth) {
                     cColorb voxelColor;
                     texture->m_image->getVoxelColor(x, y, z, voxelColor);
-                    luminosities.push_back(calculateLuminosity(voxelColor));
+                    totalLuminosity += calculateLuminosity(voxelColor);
                     ++voxelCount;
                 }
             }
         }
     }
 
-    // Calculate the average luminosity
-    float totalLuminosity = 0;
-    for (float luminosity : luminosities) {
-        totalLuminosity += luminosity;
-    }
     return voxelCount > 0 ? totalLuminosity / voxelCount : 0;
 }
 

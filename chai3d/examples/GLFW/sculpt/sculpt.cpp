@@ -246,6 +246,8 @@ cLabel* button7;
 cLabel* button8;
 cLabel* button9;
 cLabel* button10;
+cLabel* button11;
+cLabel* button12;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -276,7 +278,7 @@ int textureHeight;
 int textureDepth;
 
 // Number of voxels included in the calculation of the average luminosity for voxel value haptics
-int valueHapticsRadius = 16;
+int valueHapticsRadius = 9;
 float previousLuminosity = 0.0f;
 
 //------------------------------------------------------------------------------
@@ -356,6 +358,8 @@ void loadDataset();
 void toggleVoxelValueHaptics();
 
 void updateProbeRadius(int value);
+
+void updateValueHapticsRadius(int value);
 
 float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor);
 
@@ -755,7 +759,7 @@ int main(int argc, char* argv[])
     panel = new cPanel();
     camera->m_frontLayer->addChild(panel);
     panel->setLocalPos(10, 0);
-    panel->setSize(210, height - 70); // Adjust width and height
+    panel->setSize(230, height - 70); // Adjust width and height
     panel->setCornerRadius(10, 10, 10, 10);
     panel->setTransparencyLevel(0.5);
     panel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
@@ -796,7 +800,7 @@ int main(int argc, char* argv[])
     
     button6 = new cLabel(font);
     panel->addChild(button6);
-    button6->setLocalPos(20, panel->getHeight() - 500); // Adjusted positions
+    button6->setLocalPos(20, panel->getHeight() - 600); // Adjusted positions
     button6->setText("Quit (Q)");
     button6->m_fontColor.setWhite();
     
@@ -811,18 +815,30 @@ int main(int argc, char* argv[])
     button8->setLocalPos(20, panel->getHeight() - 350); // Adjusted positions
     button8->setText("(on) Voxel-Value Haptics (K)");
     button8->m_fontColor.setWhite();
-    
+
     button9 = new cLabel(font);
     panel->addChild(button9);
     button9->setLocalPos(20, panel->getHeight() - 400); // Adjusted positions
     button9->setText("Increase Probe Radius (+)");
     button9->m_fontColor.setWhite();
 
-	button10 = new cLabel(font);
+    button10 = new cLabel(font);
     panel->addChild(button10);
     button10->setLocalPos(20, panel->getHeight() - 450); // Adjusted positions
     button10->setText("Decrease Probe Radius (-)");
     button10->m_fontColor.setWhite();
+
+    button11 = new cLabel(font);
+    panel->addChild(button11);
+    button11->setLocalPos(20, panel->getHeight() - 500); // Adjusted positions
+    button11->setText("Increase Voxel Radius (Up)");
+    button11->m_fontColor.setWhite();
+
+    button12 = new cLabel(font);
+    panel->addChild(button12);
+    button12->setLocalPos(20, panel->getHeight() - 550); // Adjusted positions
+    button12->setText("Decrease Voxel Radius (Down)");
+    button12->m_fontColor.setWhite();
 
     // Displaying it inside the menu to avoid overlapping with system status panel
     panel->addChild(labelRates);
@@ -933,220 +949,17 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         glfwSetWindowShouldClose(a_window, GLFW_TRUE);
     }
 
-    // option - render bone and heart
-    else if (a_key == GLFW_KEY_1)
-    {
-        object->m_colorMap->setImage(boneLUT);
-        object->setIsosurfaceValue(0.32);
-        object->m_material->setDynamicFriction(0.4);
-        object->m_material->setStiffness(0.9 * maxStiffness);
-        cout << "> Isosurface set to " << cStr(object->getIsosurfaceValue(), 3) << "                            \r";
-    }
-
-    // option - render soft tissue
-    else if (a_key == GLFW_KEY_2)
-    {
-        object->m_colorMap->setImage(softLUT);
-        object->m_material->setDynamicFriction(0);
-        object->setIsosurfaceValue(0.18);
-        object->m_material->setStiffness(0.2 * maxStiffness);
-        cout << "> Isosurface set to " << cStr(object->getIsosurfaceValue(), 3) << "                            \r";
-    }
-
     // Lucas: added isosurface changes
     else if (a_key == GLFW_KEY_DOWN)
     {
-        /*if (stiffnessMultiplier > 0.1)
-        {
-            stiffnessMultiplier -= 0.1;
-            object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);
-        }
-
-        cout << "> Stiffness set to " << cStr(stiffnessMultiplier, 3) << "                            \r";*/
-        cVector3d currentPosition = object->getLocalPos();
-
-        //// Add 0.1 to the X-axis component
-        currentPosition.sub(cVector3d(0.0, 0.0, 0.01));
-
-        //// Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-        /*shaderY -= 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);*/
+        updateValueHapticsRadius(-1);
     }
 
     // Lucas: added isosurface changes
     else if (a_key == GLFW_KEY_UP)
     {
-        
-        cVector3d currentPosition = object->getLocalPos();
-
-        //// Add 0.1 to the X-axis component
-        currentPosition.add(cVector3d(0.0, 0.0, 0.01));
-
-        //// Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-
-        /*shaderY += 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);
-        */
+        updateValueHapticsRadius(1);
     }
-
-    // Lucas: added isosurface changes
-    else if (a_key == GLFW_KEY_LEFT)
-    {
-        /*object->setIsosurfaceValue(object->getIsosurfaceValue() - 0.01);
-        cout << "> Isosurface set to " << cStr(object->getIsosurfaceValue(), 3) << "                            \r";*/
-        //float tempPos = object->getGlobalPos
-        cVector3d currentPosition = object->getLocalPos();
-
-        //// Add 0.1 to the X-axis component
-        currentPosition.sub(cVector3d(0.0, 0.01, 0.0));
-
-        //// Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-
-        /*shaderX -= 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);*/
-    }
-
-    // Lucas: added isosurface changes
-    else if (a_key == GLFW_KEY_RIGHT)
-    {
-        /*object->setIsosurfaceValue(object->getIsosurfaceValue() + 0.01);
-        cout << "> Isosurface set to " << cStr(object->getIsosurfaceValue(), 3) << "                            \r";*/
-        cVector3d currentPosition = object->getLocalPos();
-
-        // Add 0.1 to the X-axis component
-        currentPosition.add(cVector3d(0.0, 0.01, 0.0));
-
-        // Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-
-
-        /*shaderX += 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);*/
-    }
-    else if (a_key == GLFW_KEY_A)
-    {
-
-        cVector3d currentPosition = object->getLocalPos();
-
-        // Add 0.1 to the X-axis component
-        currentPosition.add(cVector3d(0.01, 0.0, 0.0));
-
-        // Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-        /*shaderZ += 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);*/
-    }
-    else if (a_key == GLFW_KEY_Z)
-    {
-        cVector3d currentPosition = object->getLocalPos();
-
-        //// Add 0.1 to the X-axis component
-        currentPosition.sub(cVector3d(0.01, 0.0, 0.0));
-
-        //// Set the updated local position
-        object->setLocalPos(currentPosition);
-
-        cout << "> object set to " << cStr(currentPosition.x()) << ", " << cStr(currentPosition.y()) << ", " << cStr(currentPosition.z()) << ",                             \r";
-
-        /*shaderZ -= 0.1;
-        object->setShaderVars(shaderX, shaderY, shaderZ);*/
-    }
-
-    // option - reduce size along X axis
-    else if (a_key == GLFW_KEY_4)
-    {
-        double value = cClamp((object->m_maxCorner.x() - 0.005), 0.01, 0.5);
-        object->m_maxCorner.x(value);
-        object->m_minCorner.x(-value);
-        object->m_maxTextureCoord.x(0.5 + value);
-        object->m_minTextureCoord.x(0.5 - value);
-        cout << "> Reduce size along X axis.                            \r";
-    }
-
-    // option - increase size along X axis
-    else if (a_key == GLFW_KEY_5)
-    {
-        double value = cClamp((object->m_maxCorner.x() + 0.005), 0.01, 0.5);
-        object->m_maxCorner.x(value);
-        object->m_minCorner.x(-value);
-        object->m_maxTextureCoord.x(0.5 + value);
-        object->m_minTextureCoord.x(0.5 - value);
-        cout << "> Increase size along X axis.                            \r";
-    }
-
-    // option - reduce size along Y axis
-    else if (a_key == GLFW_KEY_6)
-    {
-        double value = cClamp((object->m_maxCorner.y() - 0.005), 0.01, 0.5);
-        object->m_maxCorner.y(value);
-        object->m_minCorner.y(-value);
-        object->m_maxTextureCoord.y(0.5 + value);
-        object->m_minTextureCoord.y(0.5 - value);
-        cout << "> Reduce size along Y axis.                            \r";
-    }
-
-    // option - increase size along Y axis
-    else if (a_key == GLFW_KEY_7)
-    {
-        double value = cClamp((object->m_maxCorner.y() + 0.005), 0.01, 0.5);
-        object->m_maxCorner.y(value);
-        object->m_minCorner.y(-value);
-        object->m_maxTextureCoord.y(0.5 + value);
-        object->m_minTextureCoord.y(0.5 - value);
-        cout << "> Increase size along Y axis.                            \r";
-    }
-
-    // option - reduce size along Z axis
-    else if (a_key == GLFW_KEY_8)
-    {
-        double value = cClamp((object->m_maxCorner.z() - 0.005), 0.01, 0.5);
-        object->m_maxCorner.z(value);
-        object->m_minCorner.z(-value);
-        object->m_maxTextureCoord.z(0.5 + value);
-        object->m_minTextureCoord.z(0.5 - value);
-        cout << "> Reduce size along Z axis.                            \r";
-    }
-
-    // option - increase size along Z axis
-    else if (a_key == GLFW_KEY_9)
-    {
-        double value = cClamp((object->m_maxCorner.z() + 0.005), 0.01, 0.5);
-        object->m_maxCorner.z(value);
-        object->m_minCorner.z(-value);
-        object->m_maxTextureCoord.z(0.5 + value);
-        object->m_minTextureCoord.z(0.5 - value);
-        cout << "> Increase size along Z axis.                            \r";
-    }
-    //// option - decrease quality of graphic rendering
-    //else if (a_key == GLFW_KEY_L)
-    //{
-    //    double value = object->getQuality();
-    //    object->setQuality(value - 0.1);
-    //    cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
-    //}
-
-    //// option - increase quality of graphic rendering
-    //else if (a_key == GLFW_KEY_H)
-    //{
-    //    double value = object->getQuality();
-    //    object->setQuality(value + 0.1);
-    //    cout << "> Quality set to " << cStr(object->getQuality(), 1) << "                            \r";
-    //}
-
-
 
     // option - polygonize model and save to file
     else if (a_key == GLFW_KEY_M)
@@ -1214,49 +1027,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     {
 		toggleVoxelValueHaptics();
 	}
-    
-
-    else if (a_key == GLFW_KEY_KP_1)
-    {
-        rotationX = rotationX - 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
-
-    else if (a_key == GLFW_KEY_KP_2)
-    {
-        rotationY = rotationY - 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
-
-    else if (a_key == GLFW_KEY_KP_3)
-    {
-        rotationZ = rotationZ - 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
-
-    else if (a_key == GLFW_KEY_KP_7)
-    {
-        rotationX = rotationX + 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
-
-    else if (a_key == GLFW_KEY_KP_8)
-    {
-        rotationY = rotationY + 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
-
-    else if (a_key == GLFW_KEY_KP_9)
-    {
-        rotationZ = rotationZ + 1;
-        object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
-        cout << "> Rotation set to " << cStr(rotationX, 3) << "," << cStr(rotationY, 3) << "," << cStr(rotationZ, 3) << " \r";
-    }
 
     else if (a_key == GLFW_KEY_SPACE)
     {
@@ -1363,6 +1133,14 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
         
         else if (isPointInsideLabel(button10, xpos, ypos)) {
             updateProbeRadius(-1);
+        }
+
+        else if (isPointInsideLabel(button11, xpos, ypos)) {
+            updateValueHapticsRadius(1);
+        }
+        
+        else if (isPointInsideLabel(button12, xpos, ypos)) {
+            updateValueHapticsRadius(-1);
         }
 
     }
@@ -1910,8 +1688,8 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     
     // set the dimensions by assigning the position of the min and max corners
     // Hand dataset
-    object->m_minCorner.set(-0.5, -0.5, -0.75);
-    object->m_maxCorner.set(0.5, 0.5, 0.75);
+    object->m_minCorner.set(-0.5, -0.5, -0.5);
+    object->m_maxCorner.set(0.5, 0.5, 0.5);
     
     
     //Value for fossil dataset dimensions
@@ -2134,7 +1912,25 @@ void updateProbeRadius(int value)
     // value can be 1 or -1, so this will increase or decrease the radius by 0.001
     toolRadius += 0.001 * value;
     tool[0]->setRadius(toolRadius);
-    cout << "> Probe radius set to " << cStr(toolRadius, 3) << "                            \r";
+}
+
+void updateValueHapticsRadius(int value)
+{
+    if (valueHapticsRadius <= 1 && value == -1)
+    {
+        showStatusMessageForSeconds(3.0, "Minimum Radius Reached");
+        return;
+    }
+
+    if (valueHapticsRadius >= 25 && value == 1)
+    {
+        showStatusMessageForSeconds(3.0, "Maximum Radius Reached");
+        return;
+    }
+
+    valueHapticsRadius += value;
+    showStatusMessageForSeconds(3.0, "Radius updated to " + cStr(valueHapticsRadius) + " voxels");
+    
 }
 
 // Smoothing function

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CHAI3D-OCULUS", "CHAI3D-OCULUS-VS2015.vcxproj", "{013851C3-3FCE-48E6-A3FD-21019751F7C0}"
 EndProject
@@ -171,5 +171,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {78C99607-0357-4659-9BDE-D4C4AFD92321}
 	EndGlobalSection
 EndGlobal

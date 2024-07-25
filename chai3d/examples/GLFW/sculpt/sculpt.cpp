@@ -271,7 +271,7 @@ float toolRadius = 0.023;
 
 cColorb color(0x00, 0x00, 0x00, 0x00);
 
-bool debugging = true;
+bool debugging = false;
 
 int textureWidth;
 int textureHeight;
@@ -1357,37 +1357,38 @@ void updateHaptics(void)
         // read user switch
         bool isFrontButtonPressed = tool[toolOne]->getUserSwitch(0);
 
-        if (isHapticsEnabled)
+        // Needs to be computed even if there are no haptics as it's needed for collision detection
+        tool[i]->computeInteractionForces();
+
+        if (tool[toolTwo]->isInContact(object) && isVoxelValueHapticsEnabled)
         {
-            tool[i]->computeInteractionForces();
+            // retrieve contact event
+            cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
 
-            if (tool[toolTwo]->isInContact(object) && isVoxelValueHapticsEnabled)
-            {
-                // retrieve contact event
-                cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
+            //averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
 
-                //averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+            // Calculate new luminosity
+            float newLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
 
-                // Calculate new luminosity
-                float newLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+            // Smooth the luminosity value
+            averageVoxelLuminosity = smoothAverageLuminosity(newLuminosity, previousLuminosity, 0.1f);
 
-                // Smooth the luminosity value
-                averageVoxelLuminosity = smoothAverageLuminosity(newLuminosity, previousLuminosity, 0.1f);
+            // Update the previous luminosity for the next iteration
+            previousLuminosity = averageVoxelLuminosity;
 
-                // Update the previous luminosity for the next iteration
-                previousLuminosity = averageVoxelLuminosity;
+            cVector3d force = tool[i]->getDeviceGlobalForce();
 
-                cVector3d force = tool[i]->getDeviceGlobalForce();
+            if (force.length() > threshold) {
 
-                if (force.length() > threshold) {
+                force.mul(averageVoxelLuminosity);
 
-                    force.mul(averageVoxelLuminosity);
-
-                    tool[i]->setDeviceGlobalForce(force);
-                }
-
+                tool[i]->setDeviceGlobalForce(force);
             }
 
+        }
+
+        if (isHapticsEnabled)
+        {
             // send forces to haptic device
             tool[i]->applyToDevice();
         }

@@ -1635,7 +1635,6 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     
     object->setStiffness(maxStiffness, true);
     
-    
     cShaderProgramPtr programShader = object->getShaderProgram();
     
     
@@ -1645,11 +1644,6 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     
     // create multi image
     image = cMultiImage::create();
-    
-    //string dataset = "tooth";
-    
-    //std::string dataset = "tooth";
-    //std::string path;
 
     // Extract the substring after the last backslash
     std::string dataset = path.substr(path.find_last_of('\\') + 1);

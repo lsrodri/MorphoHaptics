@@ -228,7 +228,6 @@ cMultiImagePtr imageFoil;
 // a virtual object
 cMultiMesh* tray;
 
-
 cHapticDeviceInfo hapticDeviceInfo;
 
 bool topView = true;
@@ -559,21 +558,17 @@ int main(int argc, char* argv[])
         mat.m_ambient.set(0.5f, 0.5f, 0.5f);
         mat.m_diffuse.set(0.8f, 0.8f, 0.8f);
         mat.m_specular.set(1.0f, 1.0f, 1.0f);
-        //mat.setWhite();
         mat.setWhite();
 
 
         // Duplicate the material to create a copy
         transparentMat = cMaterial(mat);
-        // Trying to get it to 50% opacity, but it does not work
         transparentMat.m_diffuse.set(1.0, 1.0, 1.0, 0.5); // Set white color with 50% opacity
         transparentMat.m_ambient.set(0.5f, 0.5f, 0.5f, 0.5f);
         transparentMat.m_diffuse.set(0.8f, 0.8f, 0.8f, 0.5f);
         transparentMat.setTransparencyLevel(0.5f);
 
         drills[i]->setMaterial(mat, true);
-
-
 
         // create a texture
         cTexture2dPtr maskTexture = cTexture2d::create();
@@ -588,8 +583,6 @@ int main(int argc, char* argv[])
         if (!fileload)
         {
             cout << "Error - Texture image failed to load correctly." << endl;
-            // close();
-            // return (-1);
         }
 
         //apply texture to maskObject
@@ -597,8 +590,6 @@ int main(int argc, char* argv[])
 
         //enable texture rendering 
         drills[i]->setUseTexture(true);
-        //drills[i]->setTexture(texture, true);
-
 
         drills[i]->computeAllNormals();
 
@@ -608,10 +599,6 @@ int main(int argc, char* argv[])
         drills[i]->setEdgeProperties(3, colorRed);
         drills[i]->setShowEdges(true);
         drills[i]->setEdgeLineWidth(3);
-
-        // attach drill to tool
-        // to-do, this might go under the haptic devices part as a cursor
-        //tool->m_image->addChild(drills[i]);
 
     }
 
@@ -639,8 +626,6 @@ int main(int argc, char* argv[])
         // create a tool (cursor) and insert into the world
         cursor[i] = drills[i];
 
-
-
         tool[i] = new cToolCursor(world);
         world->addChild(tool[i]);
 
@@ -653,17 +638,6 @@ int main(int argc, char* argv[])
         // if the haptic device has a gripper, enable it as a user switch
         hapticDevice[i]->setEnableGripperUserSwitch(true);
 
-        //// define a radius for the virtual tool (sphere)
-        //tool[i]->setRadius(0.03);
-
-        //tool[i]->m_image->setUseTransparency(true);
-        /*tool[i]->m_hapticPoint->m_sphereProxy->setUseTransparency(true, true);
-        tool[i]->m_image->setUseTransparency(true, true);*/
-        //tool[i]->m_hapticPoint->m_sphereProxy->m_material->setUseTransparency(true);
-
-        //// map the physical workspace of the haptic device to a larger virtual workspace.
-        //tool[i]->setWorkspaceRadius(0.55);
-
         // define a radius for the virtual tool (sphere)
         tool[i]->setRadius(toolRadius);
 
@@ -673,12 +647,6 @@ int main(int argc, char* argv[])
         // oriente tool with camera
         tool[i]->setLocalRot(camera->getLocalRot());
 
-        //world->addChild(tool[i]);
-
-
-        //tool[i]->setLocalPos(toolPositions[i]);
-
-        // 
         // haptic forces are enabled only if small forces are first sent to the device;
         // this mode avoids the force spike that occurs when the application starts when 
         // the tool is located inside an object for instance. 
@@ -687,8 +655,6 @@ int main(int argc, char* argv[])
 
         // start the haptic tool
         tool[i]->start();
-
-
 
         // read the scale factor between the physical workspace of the haptic
         // device and the virtual workspace defined for the tool
@@ -710,17 +676,12 @@ int main(int argc, char* argv[])
 
     double maxLinearForce = cMin(hapticDeviceInfo.m_maxLinearForce, 7.0);
 
-
-
-
     //--------------------------------------------------------------------------
     // CREATE OBJECT
     //--------------------------------------------------------------------------
 
-
     // create a volumetric model
     object = new cVoxelObject();
-
 
     //--------------------------------------------------------------------------
     // WIDGETS
@@ -739,13 +700,10 @@ int main(int argc, char* argv[])
     // create a small message
     labelMessage = new cLabel(font);
     labelMessage->m_fontColor.setWhite();
-    //labelMessage->setText("press keys [1,2] to toggle colormap and keys [4-9] to adjust slicing.");
-    //camera->m_frontLayer->addChild(labelMessage);
 
     // create a background
     cColorf backgroundColor;
     backgroundColor.setBlack();
-    //backgroundColor.set(0, 177, 64);
     background = new cBackground();
     camera->m_backLayer->addChild(background);
     background->setColor(backgroundColor);
@@ -880,7 +838,6 @@ int main(int argc, char* argv[])
     //--------------------------------------------------------------------------
 
     // create a thread which starts the main haptics rendering loop
-    // create a thread which starts the main haptics rendering loop
     hapticsThread = new cThread();
     hapticsThread->start(updateHaptics, CTHREAD_PRIORITY_HAPTICS);
 
@@ -942,8 +899,6 @@ void errorCallback(int a_error, const char* a_description)
 void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods)
 {
 
-
-
     // filter calls that only include a key press
     if ((a_action != GLFW_PRESS) && (a_action != GLFW_REPEAT))
     {
@@ -956,31 +911,29 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         glfwSetWindowShouldClose(a_window, GLFW_TRUE);
     }
 
-    // Lucas: added isosurface changes
     else if (a_key == GLFW_KEY_DOWN)
     {
         updateValueHapticsRadius(-1);
     }
 
-    // Lucas: added isosurface changes
     else if (a_key == GLFW_KEY_UP)
     {
         updateValueHapticsRadius(1);
     }
 
-    // option - polygonize model and save to file
+    // polygonize model and save to file
     else if (a_key == GLFW_KEY_M)
     {
         startPolygonize();
     }
 
-    // option - load dataset
+    // load dataset
     else if (a_key == GLFW_KEY_L)
     {
 		loadDataset();
 	}
 
-    // option - toggle fullscreen
+    // toggle fullscreen
     else if (a_key == GLFW_KEY_F)
     {
         // toggle state variable
@@ -1045,8 +998,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         toggleGhostMode();
     }
 
-    //cout << cStr(rotationX) << "," << cStr(rotationY) << "," << cStr(rotationZ) << "," << "                            \r";
-    // option - save voxel data to disk
     else if (a_key == GLFW_KEY_V)
     {
         startExportVolume();
@@ -1067,19 +1018,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     {
 		updateProbeRadius(-1);
 	}
-
-    /*else if (a_key == GLFW_KEY_O)
-    {
-        toolOne = 0;
-        toolTwo = 1;
-    }
-
-    else if (a_key == GLFW_KEY_P)
-    {
-        toolOne = 1;
-        toolTwo = 0;
-    }*/
-
 
 }
 
@@ -1153,6 +1091,10 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
         
         else if (isPointInsideLabel(button12, xpos, ypos)) {
             updateValueHapticsRadius(-1);
+        }
+
+        else if (isPointInsideLabel(button13, xpos, ypos)) {
+            toggleForceSmoothing();
         }
 
     }
@@ -1260,20 +1202,6 @@ void updateGraphics(void)
     /////////////////////////////////////////////////////////////////////
     // UPDATE WIDGETS
     /////////////////////////////////////////////////////////////////////
-
-
-
-    // update position of label
-    //labelRates->setLocalPos((int)(0.5 * (width - labelRates->getWidth())), 15);
-
-    // update position of message label
-    //labelMessage->setLocalPos((int)(0.5 * (width - labelMessage->getWidth())), 40);
-
-
-    //labelMessage->setText(cStr(unroundedX));
-    //labelMessage->setText(cStr(voxelIndexX));
-    //labelMessage->setText("X: " + cStr(voxelIndexX) + "Y: " + cStr(voxelIndexY) + "Z: " + cStr(voxelIndexZ) + " R: " + cStr(voxelColor.getR()));
-    //labelMessage->setText(cStr(position.get(0)));
 
     // update haptic and graphic rate data
     labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
@@ -1511,9 +1439,6 @@ void updateHaptics(void)
             state = HAPTIC_IDLE;
         }
 
-        
-        
-
     }
 
     // exit haptics thread
@@ -1565,7 +1490,6 @@ void polygonize()
     double SCALE = 0.1;
     double METERS_TO_MILLIMETERS = 1000.0;
     surface->scale(SCALE * METERS_TO_MILLIMETERS);
-    //surface->saveToFile("output/models/model.stl");
     surface->saveToFile(path + "/model.stl");
     toggleStatusMessage(false,"");
     showStatusMessageForSeconds(3.0, "Model Exported");
@@ -1621,7 +1545,6 @@ void exportVolume()
     std::replace(path.begin(), path.end(), '\\', '/');
 
     mutexObject.acquire();
-    //image->saveToFiles("output/volumes/volume", "png");
     image->saveToFiles(path + "/volume", "png");
     mutexObject.release();
     toggleStatusMessage(false, "");
@@ -1683,15 +1606,10 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
 
     object->setUseCulling(false, false);
     object->m_material->setStiffness(stiffnessMultiplier * maxStiffness);              // % of maximum linear stiffness
-    
-    //object->setGhostEnabled(true);
-    
-    
+
     // add object to world
     world->addChild(object);
-    
-    
-    
+
     // rotate object
     object->rotateExtrinsicEulerAnglesDeg(rotationX, rotationY, rotationZ, C_EULER_ORDER_XYZ);
     
@@ -1699,15 +1617,7 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     object->setLocalPos(-0.05, -0.05, 0.02);
     
     // set the dimensions by assigning the position of the min and max corners
-    /*object->m_minCorner.set(-0.25, -0.25, -0.25);
-    object->m_maxCorner.set(0.25, 0.25, 0.25);*/
-    
-    // set the dimensions by assigning the position of the min and max corners
-    //object->m_minCorner.set(-0.5, -0.5, -0.5);
-    //object->m_maxCorner.set(0.5, 0.5, 0.5);
-    
-    
-    //Value for fossil dataset dimensions
+    object->m_maxCorner.set(0.25, 0.25, 0.25);
     
     // set the texture coordinate at each corner.
     object->m_minTextureCoord.set(0, 0, 0);

@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 #include <GLFW/glfw3.h>
 
-
 #include <windows.h>
 #include <iostream>
 #include <string>
@@ -180,17 +179,9 @@ double maxStiffness;
 
 double stiffnessMultiplier = 0.9;
 
-// Setting-up variables to discover the appropriate rotateExtrinsicEulerAnglesDeg
-// Hand
-
 double rotationX = 0;
 double rotationY = 0;
 double rotationZ = 0;
-
-
-//double rotationX = 0;
-//double rotationY = 0;
-//double rotationZ = 0;
 
 double shaderX = 0.0;
 double shaderY = 0.0;

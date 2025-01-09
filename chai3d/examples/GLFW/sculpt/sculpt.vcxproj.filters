@@ -7,7 +7,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sculpt.cpp">
+    <ClCompile Include="MorphoHaptics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="includes\tinyfiledialogs.c">

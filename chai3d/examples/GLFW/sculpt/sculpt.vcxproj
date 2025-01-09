@@ -20,13 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="includes\tinyfiledialogs.c" />
-    <ClCompile Include="sculpt.cpp" />
+    <ClCompile Include="MorphoHaptics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\tinyfiledialogs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>sculpt</ProjectName>
+    <ProjectName>MorphoHaptics</ProjectName>
     <ProjectGuid>{B3B79C23-7FB4-46AF-A972-9829943E522E}</ProjectGuid>
     <RootNamespace>29-isosurface</RootNamespace>
     <Keyword>Win32Proj</Keyword>

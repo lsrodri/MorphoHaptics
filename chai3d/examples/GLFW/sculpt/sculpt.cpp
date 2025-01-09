@@ -248,6 +248,7 @@ cLabel* button9;
 cLabel* button10;
 cLabel* button11;
 cLabel* button12;
+cLabel* button13;
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -264,6 +265,8 @@ bool isHapticsEnabled = true;
 bool isSculptingEnabled = true;
 
 bool isVoxelValueHapticsEnabled = true;
+
+bool isHapticSmoothingEnabled = true;
 
 float averageVoxelLuminosity;
 
@@ -346,6 +349,8 @@ void toggleHaptics();
 void toggleSculpting();
 
 void toggleVirtualReality();
+
+void toggleForceSmoothing();
 
 float  calculateLuminosity(const cColorb& color);
 
@@ -764,81 +769,83 @@ int main(int argc, char* argv[])
     panel->setTransparencyLevel(0.5);
     panel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
 
-    // Create button 1 (vertical sequence)
     button1 = new cLabel(font);
     panel->addChild(button1);
-    button1->setLocalPos(20, panel->getHeight() - 50); // Adjusted positions
+    button1->setLocalPos(20, panel->getHeight() - 50);
     button1->setText("Load Dataset (L)");
     button1->m_fontColor.setWhite();
 
-    // Create button 2 (vertical sequence)
     button2 = new cLabel(font);
     panel->addChild(button2);
-    button2->setLocalPos(20, panel->getHeight() - 100); // Adjusted positions
+    button2->setLocalPos(20, panel->getHeight() - 100);
     button2->setText("Export Model (M)");
     button2->m_fontColor.setWhite();
 
-    // Create button 3 (vertical sequence)
     button3 = new cLabel(font);
     panel->addChild(button3);
-    button3->setLocalPos(20, panel->getHeight() - 150); // Adjusted positions
+    button3->setLocalPos(20, panel->getHeight() - 150);
     button3->setText("Export Volume (V)");
     button3->m_fontColor.setWhite();
 
-    // Create button 4 (vertical sequence)
     button4 = new cLabel(font);
     panel->addChild(button4);
-    button4->setLocalPos(20, panel->getHeight() - 200); // Adjusted positions
+    button4->setLocalPos(20, panel->getHeight() - 200);
     button4->setText("(off) Ghost Mode (Space)");
     button4->m_fontColor.setWhite();
 
     button5 = new cLabel(font);
     panel->addChild(button5);
-    button5->setLocalPos(20, panel->getHeight() - 250); // Adjusted positions
+    button5->setLocalPos(20, panel->getHeight() - 250);
     button5->setText("(on) Haptics (H)");
     button5->m_fontColor.setWhite();
     
     button6 = new cLabel(font);
     panel->addChild(button6);
-    button6->setLocalPos(20, panel->getHeight() - 600); // Adjusted positions
+    button6->setLocalPos(20, panel->getHeight() - 650);
     button6->setText("Quit (Q)");
     button6->m_fontColor.setWhite();
     
     button7 = new cLabel(font);
     panel->addChild(button7);
-    button7->setLocalPos(20, panel->getHeight() - 300); // Adjusted positions
+    button7->setLocalPos(20, panel->getHeight() - 300);
     button7->setText("(on) Sculpting (S)");
     button7->m_fontColor.setWhite();
 
 	button8 = new cLabel(font);
     panel->addChild(button8);
-    button8->setLocalPos(20, panel->getHeight() - 350); // Adjusted positions
+    button8->setLocalPos(20, panel->getHeight() - 350);
     button8->setText("(on) Voxel-Value Haptics (K)");
     button8->m_fontColor.setWhite();
 
     button9 = new cLabel(font);
     panel->addChild(button9);
-    button9->setLocalPos(20, panel->getHeight() - 400); // Adjusted positions
+    button9->setLocalPos(20, panel->getHeight() - 450);
     button9->setText("Increase Probe Radius (+)");
     button9->m_fontColor.setWhite();
 
     button10 = new cLabel(font);
     panel->addChild(button10);
-    button10->setLocalPos(20, panel->getHeight() - 450); // Adjusted positions
+    button10->setLocalPos(20, panel->getHeight() - 500);
     button10->setText("Decrease Probe Radius (-)");
     button10->m_fontColor.setWhite();
 
     button11 = new cLabel(font);
     panel->addChild(button11);
-    button11->setLocalPos(20, panel->getHeight() - 500); // Adjusted positions
+    button11->setLocalPos(20, panel->getHeight() - 550);
     button11->setText("Increase Voxel Radius (Up)");
     button11->m_fontColor.setWhite();
 
     button12 = new cLabel(font);
     panel->addChild(button12);
-    button12->setLocalPos(20, panel->getHeight() - 550); // Adjusted positions
+    button12->setLocalPos(20, panel->getHeight() - 600);
     button12->setText("Decrease Voxel Radius (Down)");
     button12->m_fontColor.setWhite();
+
+    button13 = new cLabel(font);
+    panel->addChild(button13);
+    button13->setLocalPos(20, panel->getHeight() - 400);
+    button13->setText("(on) Force Smoothing (X)");
+    button13->m_fontColor.setWhite();
 
     // Displaying it inside the menu to avoid overlapping with system status panel
     panel->addChild(labelRates);
@@ -1027,6 +1034,11 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     {
 		toggleVoxelValueHaptics();
 	}
+
+    else if (a_key == GLFW_KEY_X)
+    {
+        toggleForceSmoothing();
+    }
 
     else if (a_key == GLFW_KEY_SPACE)
     {
@@ -1365,15 +1377,20 @@ void updateHaptics(void)
             // retrieve contact event
             cCollisionEvent* contact = tool[toolTwo]->m_hapticPoint->getCollisionEvent(0);
 
-            //averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+            if (isHapticSmoothingEnabled)
+            {
+                // Calculate new luminosity
+                float newLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
 
-            // Calculate new luminosity
-            float newLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+                // Smooth the luminosity value
+                averageVoxelLuminosity = smoothAverageLuminosity(newLuminosity, previousLuminosity, 0.1f);
+            }
+            else
+            {
+                averageVoxelLuminosity = getAverageLuminosity(contact->m_voxelIndexX, contact->m_voxelIndexY, contact->m_voxelIndexZ, valueHapticsRadius);
+            }
 
-            // Smooth the luminosity value
-            averageVoxelLuminosity = smoothAverageLuminosity(newLuminosity, previousLuminosity, 0.1f);
-
-            // Update the previous luminosity for the next iteration
+            // Update the previous luminosity for the next iteration, whether or not smoothing was activated to prevent hiccups upon activation
             previousLuminosity = averageVoxelLuminosity;
 
             cVector3d force = tool[i]->getDeviceGlobalForce();
@@ -1416,8 +1433,6 @@ void updateHaptics(void)
             // release mutex
             mutexObject.release();
         }
-
-        
 
         /////////////////////////////////////////////////////////////////////////
         // MANIPULATION
@@ -1903,6 +1918,24 @@ void toggleVoxelValueHaptics()
 		showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
 		button8->m_fontColor.setWhite();
 	}
+}
+
+void toggleForceSmoothing()
+{
+    if (isHapticSmoothingEnabled)
+    {
+        isHapticSmoothingEnabled = false;
+        button13->setText("(off) Force Smoothing (X)");
+        toggleStatusMessage(true, "Force Smoothing (off)");
+        button13->m_fontColor.setRed();
+    }
+    else
+    {
+        isHapticSmoothingEnabled = true;
+        button13->setText("(on) Force Smoothing (X)");
+        showStatusMessageForSeconds(3.0, "Force Smoothings (on)");
+        button13->m_fontColor.setWhite();
+    }
 }
 
 void updateProbeRadius(int value)

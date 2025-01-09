@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01-mydevice", "examples\GLFW\01-mydevice\01-mydevice-VS2015.vcxproj", "{DF4A1F32-BA3E-4604-A9F5-721CAAA9EA71}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -381,6 +381,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04-oculus-membrane", "modul
 		{71AF75A0-52B6-4C1B-8E56-CB31C6741A18} = {71AF75A0-52B6-4C1B-8E56-CB31C6741A18}
 		{013851C3-3FCE-48E6-A3FD-21019751F7C0} = {013851C3-3FCE-48E6-A3FD-21019751F7C0}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07-oculus-voxel", "modules\OCULUS\examples\GLFW\07-oculus-voxel\07-oculus-voxel.vcxproj", "{585E66B2-D617-47E7-B510-7CA470977E08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -878,6 +880,14 @@ Global
 		{32A12607-5007-42D4-8A40-4856C43FACC7}.Release|Win32.Build.0 = Release|Win32
 		{32A12607-5007-42D4-8A40-4856C43FACC7}.Release|x64.ActiveCfg = Release|x64
 		{32A12607-5007-42D4-8A40-4856C43FACC7}.Release|x64.Build.0 = Release|x64
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Debug|Win32.ActiveCfg = Debug|Win32
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Debug|Win32.Build.0 = Debug|Win32
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Debug|x64.ActiveCfg = Debug|x64
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Debug|x64.Build.0 = Debug|x64
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Release|Win32.ActiveCfg = Release|Win32
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Release|Win32.Build.0 = Release|Win32
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Release|x64.ActiveCfg = Release|x64
+		{585E66B2-D617-47E7-B510-7CA470977E08}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -944,5 +954,6 @@ Global
 		{E2991996-9DBA-4485-98D6-65240272D5CC} = {95B32B42-DF08-4FB0-B674-A4DC98157FF3}
 		{275250E7-DD81-4C81-A18B-628F1A97379C} = {95B32B42-DF08-4FB0-B674-A4DC98157FF3}
 		{32A12607-5007-42D4-8A40-4856C43FACC7} = {95B32B42-DF08-4FB0-B674-A4DC98157FF3}
+		{585E66B2-D617-47E7-B510-7CA470977E08} = {95B32B42-DF08-4FB0-B674-A4DC98157FF3}
 	EndGlobalSection
 EndGlobal

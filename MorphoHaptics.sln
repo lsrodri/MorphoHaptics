@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sculpt", "chai3d\examples\GLFW\sculpt\sculpt.vcxproj", "{B3B79C23-7FB4-46AF-A972-9829943E522E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MorphoHaptics", "src\MorphoHaptics.vcxproj", "{B3B79C23-7FB4-46AF-A972-9829943E522E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

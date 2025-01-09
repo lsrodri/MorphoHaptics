@@ -1,7 +1,7 @@
 //==============================================================================
 /*
-    Bi-manual fossil demo
-
+    MorphoHaptics: An Open-Source Tool for Visuohaptic Exploration of Morphological Image Datasets - Siqueira Rodrigues et al.
+    This project was presented at the ACM KUI 2024 Conference in Florence, Italy
 */
 //==============================================================================
 
@@ -18,10 +18,6 @@
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-
-//------------------------------------------------------------------------------
-//#include "COculus.h"
-//------------------------------------------------------------------------------
 
 using namespace chai3d;
 using namespace std;

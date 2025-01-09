@@ -21,9 +21,11 @@
   <ItemGroup>
     <ClCompile Include="includes\tinyfiledialogs.c" />
     <ClCompile Include="MorphoHaptics.cpp" />
+    <ClCompile Include="UI\UIUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\tinyfiledialogs.h" />
+    <ClInclude Include="UI\UIUtils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>MorphoHaptics</ProjectName>

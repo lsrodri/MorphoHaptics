@@ -13,8 +13,14 @@
     <ClCompile Include="includes\tinyfiledialogs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\UIUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\tinyfiledialogs.h" />
+    <ClInclude Include="UI\UIUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

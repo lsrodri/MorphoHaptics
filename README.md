@@ -26,7 +26,7 @@ Build:
 ```
 cmake --build . --config Release
 ```
-The software was tested on Windows 10 in x64 Release mode. 
+Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was tested on Windows 10 in x64 Release mode. 
 
  <!--
 ## Licenses and Citation

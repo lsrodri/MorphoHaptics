@@ -10,6 +10,7 @@ src/.vs/
 src/bin/
 **/obj/
 **/output/
+build/
 
 # Prerequisites
 *.d

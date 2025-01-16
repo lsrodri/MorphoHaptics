@@ -13,6 +13,21 @@ The contained "source code" of this work is made available under the terms of [G
 ## Source Code
 This C++ contribution was created in Visual Studio 2022 and leverages the Chai3D Framework, included in the repository.
 
+## Instructions
+
+Use CMake 3.16 or above to Generate the VS 2022 Project:
+
+```
+cmake -S . -B . -G "Visual Studio 17 2022" -A x64
+```
+
+Build:
+
+```
+cmake --build . --config Release
+```
+The software was tested on Windows 10 in x64 Release mode. 
+
  <!--
 ## Licenses and Citation
 

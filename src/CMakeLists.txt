@@ -13,6 +13,8 @@ set(Source_Files
     "MorphoHaptics.cpp"
     "UI/UIUtils.cpp"
     "UI/UIUtils.h"
+    "Utils/Utils.h"
+    "Utils/Utils.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

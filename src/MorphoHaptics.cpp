@@ -15,6 +15,7 @@
 #include <string>
 #include <tinyfiledialogs.h>
 #include "UI/UIUtils.h"
+#include "Utils/Utils.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
@@ -57,8 +58,17 @@ enum HapticStates
     HAPTIC_SELECTION
 };
 
+
+//------------------------------------------------------------------------------
+// DECLARED CONSTANTS
+//------------------------------------------------------------------------------
+// 
+
 // maximum number of devices supported by this application
 const int MAX_DEVICES = 16;
+
+// number of haptic devices 
+const int NUM_HAPTIC_DEVICES = 1;
 
 //------------------------------------------------------------------------------
 // DECLARED VARIABLES
@@ -192,10 +202,9 @@ double shaderZ = 0.0;
 // load an object file
 bool fileload;
 
-// number of haptic devices 
-const int numHapticDevices = 1;
 
-cMultiMesh* drills[numHapticDevices];
+
+cMultiMesh* drills[NUM_HAPTIC_DEVICES];
 
 cShapeCylinder* stylus;
 
@@ -507,7 +516,7 @@ int main(int argc, char* argv[])
     /////////////////////////////////////////////////////////////////////////
 
     // create and attach drill meshes to tools 
-    for (int i = 0; i < numHapticDevices; i++) {
+    for (int i = 0; i < NUM_HAPTIC_DEVICES; i++) {
         // create a new mesh 
         drills[i] = new cMultiMesh();
 
@@ -594,7 +603,7 @@ int main(int argc, char* argv[])
     cVector3d toolPositions[2] = { toolPosLeft, toolPosRight };
 
     // setup each haptic device
-    for (int i = 0; i < numHapticDevices; i++)
+    for (int i = 0; i < NUM_HAPTIC_DEVICES; i++)
     {
         // get access to the first available haptic device found
         handler->getDevice(hapticDevice[i], i);
@@ -1115,7 +1124,7 @@ void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY)
         camera->setSphericalAzimuthDeg(azimuthDeg);
         camera->setSphericalPolarDeg(polarDeg);
 
-        for (int i = 0; i < numHapticDevices; i++)
+        for (int i = 0; i < NUM_HAPTIC_DEVICES; i++)
         {
             // oriente tool with camera
             tool[i]->setLocalRot(camera->getLocalRot());
@@ -1159,7 +1168,7 @@ void close(void)
     // wait for graphics and haptics loops to terminate
     while (!simulationFinished) { cSleepMs(100); }
 
-    for (int i = 0; i < numHapticDevices; i++)
+    for (int i = 0; i < NUM_HAPTIC_DEVICES; i++)
     {
         // close haptic device
         tool[i]->stop();
@@ -1810,9 +1819,4 @@ void updateValueHapticsRadius(int value)
     valueHapticsRadius += value;
     showStatusMessageForSeconds(3.0, "Radius updated to " + cStr(valueHapticsRadius) + " voxels");
     
-}
-
-// Smoothing function
-float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor = 0.1f) {
-    return previousLuminosity * (1.0f - smoothingFactor) + newLuminosity * smoothingFactor;
 }

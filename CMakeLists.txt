@@ -104,7 +104,10 @@ set_target_properties(chai3d PROPERTIES MAP_IMPORTED_CONFIG_MINSIZEREL Release)
 # Add the application's source directory (your existing code).
 add_subdirectory(src)
 
-# Link CHAI3D to your application target (replace 'MorphoHaptics' with your app target name).
+# Set MorphoHaptics as startup project
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MorphoHaptics)
+
+# Link CHAI3D to your application target
 target_link_libraries(MorphoHaptics PRIVATE chai3d)
 
 # Ensure the application depends on CHAI3D so it builds after CHAI3D.

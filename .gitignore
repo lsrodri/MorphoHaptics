@@ -46,7 +46,6 @@ build/
 *.out
 *.app
 
-
 # VS stuff
 *.ipch
 *.pdb
@@ -55,5 +54,20 @@ build/
 *.bin
 *.bsc
 *.tlog
-
 *.log
+ALL_BUILD.vcxproj
+ALL_BUILD.vcxproj.filters
+CMakeCache.txt
+CMakeFiles/
+MorphoHaptics.sln
+ZERO_CHECK.vcxproj
+ZERO_CHECK.vcxproj.filters
+chai3d_build/
+cmake_install.cmake
+src/CMakeFiles/
+src/MorphoHaptics.dir/
+src/MorphoHaptics.vcxproj
+src/MorphoHaptics.vcxproj.filters
+src/MorphoHaptics.vcxproj.user
+src/cmake_install.cmake
+x64/

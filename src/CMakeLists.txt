@@ -89,9 +89,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 ################################################################################
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     target_include_directories(${PROJECT_NAME} PUBLIC
-        "$<$<CONFIG:Release>:"
-            "${CMAKE_CURRENT_SOURCE_DIR}/includes"
-        ">"
+        "${CMAKE_CURRENT_SOURCE_DIR}/includes"
         "${CMAKE_CURRENT_SOURCE_DIR}/../chai3d/src;"
         "${CMAKE_CURRENT_SOURCE_DIR}/../chai3d/external/Eigen;"
         "${CMAKE_CURRENT_SOURCE_DIR}/../chai3d/external/glew/include;"

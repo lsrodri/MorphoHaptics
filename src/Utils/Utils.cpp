@@ -1,5 +1,5 @@
 // Utils.cpp
-#include "Utils/Utils.h"
+#include "Utils.h"
 
 float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor) {
     return previousLuminosity * (1.0f - smoothingFactor) + newLuminosity * smoothingFactor;

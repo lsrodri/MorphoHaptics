@@ -26,7 +26,7 @@ Build:
 ```
 cmake --build . --config Release
 ```
-Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was tested on Windows 10 in x64 Release mode. 
+Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was tested for haptic rendering using a 3DSystems Touch and a Novint Falcon on Windows 10. 
 
  <!--
 ## Licenses and Citation
@@ -41,6 +41,9 @@ Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was test
 <!-- - The [MatchToSampleExperiment](MatchToSampleExperiment) itself, available in [Creative Commons Public Domain Dedication (CC-0)](https://creativecommons.org/share-your-work/public-domain/cc0/), represented the open-source Unity project that was created by Lucas Rodrigues and used for data collection. -->
 
 <!-- The contained "source code" (i.e., Python scripts and Jupyter Notebooks) of this work is made available under the terms of [GNU GPLv3](./LICENSE). They are fully available also in the [Open Science Framework](https://). -->
+
+## Acknowledgements
+The author acknowledges the support of the Cluster of Excellence »Matters of Activity. Image Space Material« funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy – EXC 2025 – 390648296.
 
 Copyright &copy; 2024. [Cluster of Excellence Matters of Activity](https://www.matters-of-activity.de/). All rights reserved.
 

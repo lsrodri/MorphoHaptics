@@ -20,7 +20,6 @@
 #include <GLFW/glfw3native.h>
 
 using namespace chai3d;
-using namespace std;
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -309,13 +308,13 @@ void updateHaptics(void);
 // this function closes the application
 void close(void);
 
-int countFilesInDirectory(const std::string& path, const std::string& extension);
+int countFilesInDirectory(const  std::string& path, const  std::string& extension);
 
 void polygonize();
 
 void startPolygonize();
 
-std::string selectFolder();
+ std::string selectFolder();
 
 void exportVolume();
 
@@ -335,7 +334,7 @@ float  calculateLuminosity(const cColorb& color);
 
 float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius);
 
-void createVoxelObject(cVoxelObject* object, string path, char* argv[]);
+void createVoxelObject(cVoxelObject* object, std::string path, char* argv[]);
 
 void loadDataset();
 
@@ -355,7 +354,7 @@ int main(int argc, char* argv[])
 
 
     // parse first arg to try and locate resources
-    string resourceRoot = string(argv[0]).substr(0, string(argv[0]).find_last_of("/\\") + 1);
+    std::string resourceRoot = std::string(argv[0]).substr(0, std::string(argv[0]).find_last_of("/\\") + 1);
 
 
     //--------------------------------------------------------------------------
@@ -365,7 +364,7 @@ int main(int argc, char* argv[])
     // initialize GLFW library
     if (!glfwInit())
     {
-        cout << "failed initialization" << endl;
+        std::cout << "failed initialization" << std::endl;
         cSleepMs(1000);
         return 1;
     }
@@ -398,7 +397,7 @@ int main(int argc, char* argv[])
     window = glfwCreateWindow(w, h, "MorphoHaptics - Voxel Sculpting", NULL, NULL);
     if (!window)
     {
-        cout << "failed to create window" << endl;
+        std::cout << "failed to create window" << std::endl;
         cSleepMs(1000);
         glfwTerminate();
         return 1;
@@ -443,7 +442,7 @@ int main(int argc, char* argv[])
     // initialize GLEW library
     if (glewInit() != GLEW_OK)
     {
-        cout << "failed to initialize GLEW library" << endl;
+        std::cout << "failed to initialize GLEW library" << std::endl;
         glfwTerminate();
         return 1;
     }
@@ -562,7 +561,7 @@ int main(int argc, char* argv[])
         }
         if (!fileload)
         {
-            cout << "Error - Texture image failed to load correctly." << endl;
+            std::cout << "Error - Texture image failed to load correctly." << std::endl;
         }
 
         //apply texture to maskObject
@@ -694,7 +693,7 @@ int main(int argc, char* argv[])
     if (!fileload)
     {
         // Handle error if icon is not loaded
-        cout << "Error - Sandwich icon image failed to load correctly." << endl;
+        std::cout << "Error - Sandwich icon image failed to load correctly." << std::endl;
         return -1;
     }
 
@@ -871,7 +870,7 @@ void windowSizeCallback(GLFWwindow* a_window, int a_width, int a_height)
 
 void errorCallback(int a_error, const char* a_description)
 {
-    cout << "Error: " << a_description << endl;
+    std::cout << "Error: " << a_description << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -1136,7 +1135,7 @@ void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offset
 //------------------------------------------------------------------------------
 
 
-int countFilesInDirectory(const std::string& path, const std::string& extension) {
+int countFilesInDirectory(const  std::string& path, const  std::string& extension) {
     WIN32_FIND_DATA findFileData;
     HANDLE hFind = FindFirstFile((path + "/*" + extension).c_str(), &findFileData);
 
@@ -1226,7 +1225,7 @@ void updateGraphics(void)
 
     // check for any OpenGL errors
     GLenum err = glGetError();
-    if (err != GL_NO_ERROR) cout << "Error: " << gluErrorString(err) << endl;
+    if (err != GL_NO_ERROR) std::cout << "Error: " << gluErrorString(err) << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -1440,7 +1439,7 @@ void startPolygonize()
 
 void polygonize()
 {
-    string path = selectFolder();
+    std::string path = selectFolder();
 
     std::replace(path.begin(), path.end(), '\\', '/');
 
@@ -1455,7 +1454,7 @@ void polygonize()
     delete surface;
 }
 
-std::string selectFolder()
+ std::string selectFolder()
 {
     const char* path = tinyfd_selectFolderDialog("Select Folder", nullptr);
     if (path)
@@ -1467,14 +1466,14 @@ std::string selectFolder()
         ShowWindow(hwnd, SW_RESTORE);
 
         SetForegroundWindow(hwnd);
-        return std::string(path);
+        return  std::string(path);
     }
-    return std::string();
+    return  std::string();
 }
 
 void exportVolume()
 {
-    string path = selectFolder();
+    std::string path = selectFolder();
 
     std::replace(path.begin(), path.end(), '\\', '/');
 
@@ -1531,7 +1530,7 @@ void toggleHaptics()
 }
 
 
-void createVoxelObject(cVoxelObject* object, string path, char* argv[])
+void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
 {
     
     rotationX = -23;
@@ -1580,7 +1579,7 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     image = cMultiImage::create();
 
     // Extract the substring after the last backslash
-    std::string dataset = path.substr(path.find_last_of('\\') + 1);
+     std::string dataset = path.substr(path.find_last_of('\\') + 1);
 
 #if defined(_MSVC)
     //path = "resources/volumes/" + dataset + "/"; // Adjust path as necessary
@@ -1601,7 +1600,7 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     }
 
     if (filesloaded == 0) {
-        cout << "Error - Failed to load volume data." << endl;
+        std::cout << "Error - Failed to load volume data." << std::endl;
         close();
         return;
     }
@@ -1649,7 +1648,7 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
     }
     if (!fileLoaded)
     {
-        cout << "Error - Failed to load colormap." << endl;
+        std::cout << "Error - Failed to load colormap." << std::endl;
         close();
         return;
     }
@@ -1670,8 +1669,8 @@ void createVoxelObject(cVoxelObject* object, string path, char* argv[])
 
 void loadDataset()
 {
-    string path = selectFolder();
-    cout << path << endl;
+    std::string path = selectFolder();
+    std::cout << path << std::endl;
     if (path.empty())
     {
 		return;

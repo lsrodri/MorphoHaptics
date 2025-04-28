@@ -640,20 +640,13 @@ int main(int argc, char* argv[])
         // the tool is located inside an object for instance. 
         tool[i]->setWaitForSmallForce(true);
 
-
         // start the haptic tool
         tool[i]->start();
-
-        // read the scale factor between the physical workspace of the haptic
-        // device and the virtual workspace defined for the tool
 
     }
 
     tool[toolOne]->setLocalPos(toolPosLeft);
     tool[toolTwo]->setLocalPos(toolPosRight);
-    //tool[0]->m_hapticPoint->initialize(toolZero);
-    //tool[1]->m_hapticPoint->initialize(toolOne);
-
 
     double workspaceScaleFactor = tool[0]->getWorkspaceScaleFactor();
     // stiffness properties
@@ -1174,7 +1167,6 @@ void close(void)
         tool[i]->stop();
     }
 
-
     // delete resources
     delete hapticsThread;
     delete polyTaskThread;
@@ -1679,7 +1671,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
 void loadDataset()
 {
     std::string path = selectFolder();
-    std::cout << path << std::endl;
     if (path.empty())
     {
 		return;

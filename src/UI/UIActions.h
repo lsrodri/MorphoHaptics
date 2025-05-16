@@ -12,3 +12,5 @@ void toggleForceSmoothing();
 void toggleSculpting();
 
 void toggleVoxelValueHaptics();
+
+void toggleGhostMode();

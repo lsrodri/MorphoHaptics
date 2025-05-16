@@ -306,8 +306,6 @@ void exportVolume();
 
 void startExportVolume();
 
-void toggleGhostMode();
-
 void toggleHaptics();
 
 float  calculateLuminosity(const cColorb& color);
@@ -1455,23 +1453,6 @@ void startExportVolume()
     exportVolumeThread->start(exportVolume, CTHREAD_PRIORITY_GRAPHICS);
 }
 
-void toggleGhostMode()
-{
-	object->setGhostEnabled(!object->getGhostEnabled());
-    if (object->getGhostEnabled())
-    {
-		button4->setText("(on) Ghost Mode (Space)");
-        button4->m_fontColor.setGreen();
-        toggleStatusMessage(true, "Ghost Mode (on)");
-	}
-    else
-    {
-		button4->setText("(off) Ghost Mode (Space)");
-        button4->m_fontColor.setWhite();
-        showStatusMessageForSeconds(3.0, "Ghost Mode (off)");
-	}
-}
-
 void toggleHaptics()
 {
     if (isHapticsEnabled)
@@ -1640,8 +1621,6 @@ void loadDataset()
 		createVoxelObject(object, path, nullptr);
 	}
 }
-
-
 
 // Function to calculate luminosity including alpha to reduce the effect of fully transparent colors
 float calculateLuminosity(const cColorb& color) {

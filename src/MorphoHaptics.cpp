@@ -316,8 +316,6 @@ void loadDataset();
 
 void updateProbeRadius(int value);
 
-void updateValueHapticsRadius(int value);
-
 float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor);
 
 int main(int argc, char* argv[])
@@ -1654,23 +1652,4 @@ void updateProbeRadius(int value)
     // value can be 1 or -1, so this will increase or decrease the radius by 0.001
     toolRadius += 0.001 * value;
     tool[0]->setRadius(toolRadius);
-}
-
-void updateValueHapticsRadius(int value)
-{
-    if (valueHapticsRadius <= 1 && value == -1)
-    {
-        showStatusMessageForSeconds(3.0, "Minimum Radius Reached");
-        return;
-    }
-
-    if (valueHapticsRadius >= 25 && value == 1)
-    {
-        showStatusMessageForSeconds(3.0, "Maximum Radius Reached");
-        return;
-    }
-
-    valueHapticsRadius += value;
-    showStatusMessageForSeconds(3.0, "Radius updated to " + cStr(valueHapticsRadius) + " voxels");
-    
 }

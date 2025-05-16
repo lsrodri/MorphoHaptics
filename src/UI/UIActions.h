@@ -5,7 +5,6 @@ extern chai3d::cLabel* button13; // Use the namespace to resolve ambiguity
 // Extern declarations for variables used in toggleForceSmoothing
 extern bool isHapticSmoothingEnabled;
 
-
 // Function declaration
 void toggleForceSmoothing();
 
@@ -16,3 +15,5 @@ void toggleVoxelValueHaptics();
 void toggleGhostMode();
 
 void toggleHaptics();
+
+void updateValueHapticsRadius(int value);

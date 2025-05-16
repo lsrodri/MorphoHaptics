@@ -6,6 +6,8 @@ extern bool isHapticSmoothingEnabled;
 extern bool isVoxelValueHapticsEnabled;
 extern bool isHapticsEnabled;
 
+extern int valueHapticsRadius;
+
 extern chai3d::cVoxelObject* object;
 
 extern chai3d::cLabel* button4;
@@ -104,4 +106,27 @@ void toggleHaptics()
         showStatusMessageForSeconds(3.0, "Haptics (on)");
         button5->m_fontColor.setWhite();
     }
+}
+
+void updateValueHapticsRadius(int value)
+{
+    if (valueHapticsRadius <= 1 && value == -1)
+    {
+        showStatusMessageForSeconds(3.0, "Minimum Radius Reached");
+        return;
+    }
+
+    if (valueHapticsRadius >= 25 && value == 1)
+    {
+        showStatusMessageForSeconds(3.0, "Maximum Radius Reached");
+        return;
+    }
+
+    valueHapticsRadius += value;
+    showStatusMessageForSeconds(3.0, "Radius updated to " + std::to_string(valueHapticsRadius) + " voxels");
+
+    #include <sstream> // Add this include for stringstream
+
+    // Replace the problematic line with the following implementation
+    showStatusMessageForSeconds(3.0, "Radius updated to " + std::to_string(valueHapticsRadius) + " voxels");
 }

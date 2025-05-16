@@ -22,19 +22,6 @@
 #include <GLFW/glfw3native.h>
 
 using namespace chai3d;
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// GENERAL SETTINGS
-//------------------------------------------------------------------------------
-
-// stereo Mode
-/*
-    C_STEREO_DISABLED:            Stereo is disabled
-    C_STEREO_ACTIVE:              Active stereo for OpenGL NVDIA QUADRO cards
-    C_STEREO_PASSIVE_LEFT_RIGHT:  Passive stereo where L/R images are rendered next to each other
-    C_STEREO_PASSIVE_TOP_BOTTOM:  Passive stereo where L/R images are rendered above each other
-*/
 cStereoMode stereoMode = C_STEREO_DISABLED;
 
 // fullscreen mode
@@ -161,16 +148,8 @@ cMaterial transparentMat;
 int toolOne = 0;
 int toolTwo = 0;
 
-/*
-
-Voxel-Basic Volume Editing Variables
-
-*/
-
-// mutex to object
 cMutex mutexObject;
 
-// mutex to voxel
 cMutex mutexVoxel;
 
 // region of voxels being updated
@@ -182,9 +161,7 @@ bool flagMarkVolumeForUpdate = false;
 // 3D texture object
 cTexture3dPtr texture;
 
-// Making double maxStiffness global
 double maxStiffness;
-
 double stiffnessMultiplier = 0.9;
 
 double rotationX = 0;
@@ -208,7 +185,6 @@ cHapticDeviceInfo hapticDeviceInfo;
 cTexture2dPtr sandwichIcon;
 cPanel* panel;
 cLabel* button1, *button2, *button3, *button4, *button5, *button6, *button7, *button8, *button9, *button10, *button11, *button12, *button13;
-
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -221,11 +197,8 @@ double statusPanelDisplayTime = 0.0;
 double statusMessageDisplayTime = 0.0;
 
 bool isHapticsEnabled = true;
-
 bool isSculptingEnabled = true;
-
 bool isVoxelValueHapticsEnabled = true;
-
 bool isHapticSmoothingEnabled = true;
 
 float averageVoxelLuminosity;
@@ -256,31 +229,22 @@ float previousLuminosity = 0.0f;
 // DECLARED FUNCTIONS
 //------------------------------------------------------------------------------
 
-// callback when the window display is resized
 void windowSizeCallback(GLFWwindow* a_window, int a_width, int a_height);
 
-// callback when an error GLFW occurs
 void errorCallback(int error, const char* a_description);
 
-// callback when a key is pressed
 void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods);
 
-// callback to handle mouse click
 void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
 
-// callback to handle mouse motion
 void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY);
 
-// callback to handle mouse scroll
 void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY);
 
-// this function renders the scene
 void updateGraphics(void);
 
-// this function contains the main haptics simulation loop
 void updateHaptics(void);
 
-// this function closes the application
 void close(void);
 
 int countFilesInDirectory(const  std::string& path, const  std::string& extension);
@@ -354,25 +318,18 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // get width and height of window
     glfwGetWindowSize(window, &width, &height);
 
-    // set position of window
     glfwSetWindowPos(window, x, y);
 
-    // set key callback
     glfwSetKeyCallback(window, keyCallback);
 
-    // set resize callback
     glfwSetWindowSizeCallback(window, windowSizeCallback);
 
-    // set mouse position callback
     glfwSetCursorPosCallback(window, mouseMotionCallback);
 
-    // set mouse button callback
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
-    // set mouse scroll callback
     glfwSetScrollCallback(window, mouseScrollCallback);
 
     // set current display context
@@ -451,7 +408,6 @@ int main(int argc, char* argv[])
 
     // create a font
     font = NEW_CFONTCALIBRI20();
-
 
     /////////////////////////////////////////////////////////////////////////
     // OBJECT "DRILL"
@@ -583,7 +539,6 @@ int main(int argc, char* argv[])
 
         // start the haptic tool
         tool[i]->start();
-
     }
 
     tool[toolOne]->setLocalPos(toolPosLeft);
@@ -947,7 +902,6 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
         // update mouse state
         mouseState = MOUSE_MOVE_CAMERA;
     }
-
 
     else
     {

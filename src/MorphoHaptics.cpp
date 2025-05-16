@@ -207,19 +207,8 @@ cHapticDeviceInfo hapticDeviceInfo;
 // UI Layer and components
 cTexture2dPtr sandwichIcon;
 cPanel* panel;
-cLabel* button1;
-cLabel* button2;
-cLabel* button3;
-cLabel* button4;
-cLabel* button5;
-cLabel* button6;
-cLabel* button7;
-cLabel* button8;
-cLabel* button9;
-cLabel* button10;
-cLabel* button11;
-cLabel* button12;
-cLabel* button13;
+cLabel* button1, *button2, *button3, *button4, *button5, *button6, *button7, *button8, *button9, *button10, *button11, *button12, *button13;
+
 cPanel* sandwichButton;
 bool isUILayerVisible = true;
 
@@ -309,8 +298,6 @@ void startExportVolume();
 void createVoxelObject(cVoxelObject* object, std::string path, char* argv[]);
 
 void loadDataset();
-
-float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor);
 
 int main(int argc, char* argv[])
 {
@@ -611,16 +598,8 @@ int main(int argc, char* argv[])
 
     double maxLinearForce = cMin(hapticDeviceInfo.m_maxLinearForce, 7.0);
 
-    //--------------------------------------------------------------------------
-    // CREATE OBJECT
-    //--------------------------------------------------------------------------
-
     // create a volumetric model
     object = new cVoxelObject();
-
-    //--------------------------------------------------------------------------
-    // WIDGETS
-    //--------------------------------------------------------------------------
 
     // create a font
     font = NEW_CFONTCALIBRI20();
@@ -662,83 +641,19 @@ int main(int argc, char* argv[])
     panel->setTransparencyLevel(0.5);
     panel->setColor(cColorf(0.3f, 0.3f, 0.3f, 0.5f)); // semi-transparent background
 
-    button1 = new cLabel(font);
-    panel->addChild(button1);
-    button1->setLocalPos(20, panel->getHeight() - 50);
-    button1->setText("Load Dataset (L)");
-    button1->m_fontColor.setWhite();
-
-    button2 = new cLabel(font);
-    panel->addChild(button2);
-    button2->setLocalPos(20, panel->getHeight() - 100);
-    button2->setText("Export Model (M)");
-    button2->m_fontColor.setWhite();
-
-    button3 = new cLabel(font);
-    panel->addChild(button3);
-    button3->setLocalPos(20, panel->getHeight() - 150);
-    button3->setText("Export Volume (V)");
-    button3->m_fontColor.setWhite();
-
-    button4 = new cLabel(font);
-    panel->addChild(button4);
-    button4->setLocalPos(20, panel->getHeight() - 200);
-    button4->setText("(off) Ghost Mode (Space)");
-    button4->m_fontColor.setWhite();
-
-    button5 = new cLabel(font);
-    panel->addChild(button5);
-    button5->setLocalPos(20, panel->getHeight() - 250);
-    button5->setText("(on) Haptics (H)");
-    button5->m_fontColor.setWhite();
-    
-    button6 = new cLabel(font);
-    panel->addChild(button6);
-    button6->setLocalPos(20, panel->getHeight() - 650);
-    button6->setText("Quit (Q)");
-    button6->m_fontColor.setWhite();
-    
-    button7 = new cLabel(font);
-    panel->addChild(button7);
-    button7->setLocalPos(20, panel->getHeight() - 300);
-    button7->setText("(on) Sculpting (S)");
-    button7->m_fontColor.setWhite();
-
-	button8 = new cLabel(font);
-    panel->addChild(button8);
-    button8->setLocalPos(20, panel->getHeight() - 350);
-    button8->setText("(on) Voxel-Value Haptics (K)");
-    button8->m_fontColor.setWhite();
-
-    button9 = new cLabel(font);
-    panel->addChild(button9);
-    button9->setLocalPos(20, panel->getHeight() - 450);
-    button9->setText("Increase Probe Radius (+)");
-    button9->m_fontColor.setWhite();
-
-    button10 = new cLabel(font);
-    panel->addChild(button10);
-    button10->setLocalPos(20, panel->getHeight() - 500);
-    button10->setText("Decrease Probe Radius (-)");
-    button10->m_fontColor.setWhite();
-
-    button11 = new cLabel(font);
-    panel->addChild(button11);
-    button11->setLocalPos(20, panel->getHeight() - 550);
-    button11->setText("Increase Voxel Radius (Up)");
-    button11->m_fontColor.setWhite();
-
-    button12 = new cLabel(font);
-    panel->addChild(button12);
-    button12->setLocalPos(20, panel->getHeight() - 600);
-    button12->setText("Decrease Voxel Radius (Down)");
-    button12->m_fontColor.setWhite();
-
-    button13 = new cLabel(font);
-    panel->addChild(button13);
-    button13->setLocalPos(20, panel->getHeight() - 400);
-    button13->setText("(on) Force Smoothing (X)");
-    button13->m_fontColor.setWhite();
+    createPanelButton(button1, panel, font, "Load Dataset (L)", 50);
+    createPanelButton(button2, panel, font, "Export Model (M)", 100);
+    createPanelButton(button3, panel, font, "Export Volume (V)", 150);
+    createPanelButton(button4, panel, font, "(off) Ghost Mode (Space)", 200);
+    createPanelButton(button5, panel, font, "(on) Haptics (H)", 250);
+    createPanelButton(button6, panel, font, "Quit (Q)", 650);
+    createPanelButton(button7, panel, font, "(on) Sculpting (S)", 300);
+    createPanelButton(button8, panel, font, "(on) Voxel-Value Haptics (K)", 350);
+    createPanelButton(button9, panel, font, "Increase Probe Radius (+)", 450);
+    createPanelButton(button10, panel, font, "Decrease Probe Radius (-)", 500);
+    createPanelButton(button11, panel, font, "Increase Voxel Radius (Up)", 550);
+    createPanelButton(button12, panel, font, "Decrease Voxel Radius (Down)", 600);
+    createPanelButton(button13, panel, font, "(on) Force Smoothing (X)", 400);
 
     // Displaying it inside the menu to avoid overlapping with system status panel
     panel->addChild(labelRates);
@@ -970,22 +885,18 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
             panel->setShowEnabled(isUILayerVisible);
         }
 
-        // Check if button 1 was clicked
         else if (isPointInsideLabel(button1, xpos, ypos)) {
             loadDataset();
         }
 
-        // Check if button 2 was clicked
         else if (isPointInsideLabel(button2, xpos, ypos)) {
             startPolygonize();
         }
 
-        // Check if button 3 was clicked
         else if (isPointInsideLabel(button3, xpos, ypos)) {
             startExportVolume();
         }
 
-        // Check if button 4 was clicked
         else if (isPointInsideLabel(button4, xpos, ypos)) {
             toggleGhostMode();
         }
@@ -1127,17 +1038,9 @@ void close(void)
 
 void updateGraphics(void)
 {
-    /////////////////////////////////////////////////////////////////////
-    // UPDATE WIDGETS
-    /////////////////////////////////////////////////////////////////////
-
     // update haptic and graphic rate data
     labelRates->setText(cStr(freqCounterGraphics.getFrequency(), 0) + " Hz / " +
         cStr(freqCounterHaptics.getFrequency(), 0) + " Hz");
-
-    /////////////////////////////////////////////////////////////////////
-    // VOLUME UPDATE
-    /////////////////////////////////////////////////////////////////////
 
     // update region of voxels to be updated
     if (flagMarkVolumeForUpdate)
@@ -1592,5 +1495,3 @@ void loadDataset()
 		createVoxelObject(object, path, nullptr);
 	}
 }
-
-

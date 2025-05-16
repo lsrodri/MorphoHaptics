@@ -54,3 +54,17 @@ void showStatusMessageForSeconds(double seconds, const std::string& message)
     statusMessage->setLocalPos((width - statusMessage->getWidth()) / 2, 15);
     statusMessage->setShowEnabled(true);
 }
+
+void createPanelButton(
+    chai3d::cLabel*& button,
+    chai3d::cPanel* parentPanel,
+    chai3d::cFontPtr font,
+    const std::string& text,
+    int yOffset
+) {
+    button = new chai3d::cLabel(font);
+    parentPanel->addChild(button);
+    button->setLocalPos(20, parentPanel->getHeight() - yOffset);
+    button->setText(text);
+    button->m_fontColor.setWhite();
+}

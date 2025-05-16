@@ -310,8 +310,6 @@ void toggleGhostMode();
 
 void toggleHaptics();
 
-void toggleSculpting();
-
 float  calculateLuminosity(const cColorb& color);
 
 float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius);
@@ -1645,23 +1643,7 @@ void loadDataset()
 	}
 }
 
-void toggleSculpting()
-{
-    if (isSculptingEnabled)
-    {
-		isSculptingEnabled = false;
-		button7->setText("(off) Sculpting (S)");
-		toggleStatusMessage(true, "Sculpting (off)");
-        button7->m_fontColor.setRed();
-	}
-    else
-    {
-		isSculptingEnabled = true;
-        button7->setText("(on) Sculpting (S)");
-		showStatusMessageForSeconds(3.0, "Sculpting (on)");
-        button7->m_fontColor.setWhite();
-	}
-}
+
 
 // Function to calculate luminosity including alpha to reduce the effect of fully transparent colors
 float calculateLuminosity(const cColorb& color) {

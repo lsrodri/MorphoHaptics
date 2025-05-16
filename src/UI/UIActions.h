@@ -8,3 +8,5 @@ extern bool isHapticSmoothingEnabled;
 
 // Function declaration
 void toggleForceSmoothing();
+
+void toggleSculpting();

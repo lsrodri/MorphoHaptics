@@ -3,7 +3,10 @@
 #include <iostream>
 
 extern bool isHapticSmoothingEnabled;
+extern bool isVoxelValueHapticsEnabled;
+
 extern chai3d::cLabel* button7;
+extern chai3d::cLabel* button8;
 extern chai3d::cLabel* button13;
 
 extern bool isSculptingEnabled;
@@ -42,5 +45,23 @@ void toggleSculpting()
         button7->setText("(on) Sculpting (S)");
         showStatusMessageForSeconds(3.0, "Sculpting (on)");
         button7->m_fontColor.setWhite();
+    }
+}
+
+void toggleVoxelValueHaptics()
+{
+    if (isVoxelValueHapticsEnabled)
+    {
+        isVoxelValueHapticsEnabled = false;
+        button8->setText("(off) Voxel-Value Haptics (K)");
+        toggleStatusMessage(true, "Voxel-Value Haptics (off)");
+        button8->m_fontColor.setRed();
+    }
+    else
+    {
+        isVoxelValueHapticsEnabled = true;
+        button8->setText("(on) Voxel-Value Haptics (K)");
+        showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
+        button8->m_fontColor.setWhite();
     }
 }

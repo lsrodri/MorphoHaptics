@@ -318,8 +318,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[]);
 
 void loadDataset();
 
-void toggleVoxelValueHaptics();
-
 void updateProbeRadius(int value);
 
 void updateValueHapticsRadius(int value);
@@ -1680,23 +1678,7 @@ float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius) {
     return voxelCount > 0 ? totalLuminosity / voxelCount : 0;
 }
 
-void toggleVoxelValueHaptics()
-{
-    if (isVoxelValueHapticsEnabled)
-    {
-		isVoxelValueHapticsEnabled = false;
-		button8->setText("(off) Voxel-Value Haptics (K)");
-		toggleStatusMessage(true, "Voxel-Value Haptics (off)");
-		button8->m_fontColor.setRed();
-	}
-    else
-    {
-		isVoxelValueHapticsEnabled = true;
-		button8->setText("(on) Voxel-Value Haptics (K)");
-		showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
-		button8->m_fontColor.setWhite();
-	}
-}
+
 
 void updateProbeRadius(int value)
 {

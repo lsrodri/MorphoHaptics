@@ -10,3 +10,5 @@ extern bool isHapticSmoothingEnabled;
 void toggleForceSmoothing();
 
 void toggleSculpting();
+
+void toggleVoxelValueHaptics();

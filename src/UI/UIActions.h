@@ -17,3 +17,5 @@ void toggleGhostMode();
 void toggleHaptics();
 
 void updateValueHapticsRadius(int value);
+
+void updateProbeRadius(int value);

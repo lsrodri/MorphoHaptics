@@ -7,8 +7,11 @@ extern bool isVoxelValueHapticsEnabled;
 extern bool isHapticsEnabled;
 
 extern int valueHapticsRadius;
+extern float toolRadius;
 
 extern chai3d::cVoxelObject* object;
+
+extern chai3d::cToolCursor* tool[];
 
 extern chai3d::cLabel* button4;
 extern chai3d::cLabel* button5;
@@ -129,4 +132,22 @@ void updateValueHapticsRadius(int value)
 
     // Replace the problematic line with the following implementation
     showStatusMessageForSeconds(3.0, "Radius updated to " + std::to_string(valueHapticsRadius) + " voxels");
+}
+
+void updateProbeRadius(int value)
+{
+    if (toolRadius <= 0.023 && value == -1)
+    {
+        showStatusMessageForSeconds(3.0, "Minimum Probe Size Reached");
+        return;
+    }
+    if (toolRadius >= 0.06 && value == 1)
+    {
+        showStatusMessageForSeconds(3.0, "Maximum Probe Size Reached");
+        return;
+    }
+
+    // value can be 1 or -1, so this will increase or decrease the radius by 0.001
+    toolRadius += 0.001 * value;
+    tool[0]->setRadius(toolRadius);
 }

@@ -314,8 +314,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[]);
 
 void loadDataset();
 
-void updateProbeRadius(int value);
-
 float smoothAverageLuminosity(float newLuminosity, float previousLuminosity, float smoothingFactor);
 
 int main(int argc, char* argv[])
@@ -1636,20 +1634,4 @@ float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius) {
 
 
 
-void updateProbeRadius(int value)
-{
-    if (toolRadius <= 0.023 && value == -1)
-    {
-        showStatusMessageForSeconds(3.0, "Minimum Probe Size Reached");
-		return;
-	}
-    if (toolRadius >= 0.06 && value == 1)
-    {
-		showStatusMessageForSeconds(3.0, "Maximum Probe Size Reached");
-        return;
-    }
 
-    // value can be 1 or -1, so this will increase or decrease the radius by 0.001
-    toolRadius += 0.001 * value;
-    tool[0]->setRadius(toolRadius);
-}

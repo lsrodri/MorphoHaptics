@@ -16,6 +16,7 @@
 #include <tinyfiledialogs.h>
 #include "UI/UIUtils.h"
 #include "Utils/Utils.h"
+#include "UI/UIActions.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
@@ -103,7 +104,6 @@ cVoxelObject* object;
 
 // color lookup tables for the volume
 cImagePtr boneLUT;
-cImagePtr softLUT;
 
 // angular velocity of object
 cVector3d angVel(0.0, 0.0, 0.1);
@@ -198,18 +198,11 @@ bool fileload;
 
 cMultiMesh* drills[NUM_HAPTIC_DEVICES];
 
-cShapeCylinder* stylus;
-
 cVector3d position;
 
 cMultiImagePtr image;
 
-// a virtual object
-cMultiMesh* tray;
-
 cHapticDeviceInfo hapticDeviceInfo;
-
-bool topView = true;
 
 // UI Layer and components
 cTexture2dPtr sandwichIcon;
@@ -259,6 +252,7 @@ int textureHeight;
 int textureDepth;
 
 // Number of voxels included in the calculation of the average luminosity for voxel value haptics
+// Initially set to 9, but can be adjusted based on the size of the voxel object
 int valueHapticsRadius = 9;
 float previousLuminosity = 0.0f;
 
@@ -306,7 +300,7 @@ void polygonize();
 
 void startPolygonize();
 
- std::string selectFolder();
+std::string selectFolder();
 
 void exportVolume();
 
@@ -317,8 +311,6 @@ void toggleGhostMode();
 void toggleHaptics();
 
 void toggleSculpting();
-
-void toggleForceSmoothing();
 
 float  calculateLuminosity(const cColorb& color);
 
@@ -342,10 +334,8 @@ int main(int argc, char* argv[])
     // INITIALIZATION
     //--------------------------------------------------------------------------
 
-
     // parse first arg to try and locate resources
     std::string resourceRoot = std::string(argv[0]).substr(0, std::string(argv[0]).find_last_of("/\\") + 1);
-
 
     //--------------------------------------------------------------------------
     // OPEN GL - WINDOW DISPLAY
@@ -528,7 +518,6 @@ int main(int argc, char* argv[])
         mat.m_diffuse.set(0.8f, 0.8f, 0.8f);
         mat.m_specular.set(1.0f, 1.0f, 1.0f);
         mat.setWhite();
-
 
         // Duplicate the material to create a copy
         transparentMat = cMaterial(mat);
@@ -924,7 +913,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         }
     }
 
-    
     else if (a_key == GLFW_KEY_G)
     {
         object->setGhostEnabled(!object->getGhostEnabled());
@@ -1726,24 +1714,6 @@ void toggleVoxelValueHaptics()
 		showStatusMessageForSeconds(3.0, "Voxel-Value Haptics (on)");
 		button8->m_fontColor.setWhite();
 	}
-}
-
-void toggleForceSmoothing()
-{
-    if (isHapticSmoothingEnabled)
-    {
-        isHapticSmoothingEnabled = false;
-        button13->setText("(off) Force Smoothing (X)");
-        toggleStatusMessage(true, "Force Smoothing (off)");
-        button13->m_fontColor.setRed();
-    }
-    else
-    {
-        isHapticSmoothingEnabled = true;
-        button13->setText("(on) Force Smoothing (X)");
-        showStatusMessageForSeconds(3.0, "Force Smoothings (on)");
-        button13->m_fontColor.setWhite();
-    }
 }
 
 void updateProbeRadius(int value)

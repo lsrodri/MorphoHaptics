@@ -1,8 +1,8 @@
 #pragma once
-#include "chai3d.h" // Ensure CHAI3D headers are included
+#include "chai3d.h"
 
-extern chai3d::cLabel* button13; // Use the namespace to resolve ambiguity
-// Extern declarations for variables used in toggleForceSmoothing
+extern chai3d::cLabel* button13;
+
 extern bool isHapticSmoothingEnabled;
 
 // Function declaration

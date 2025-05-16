@@ -42,7 +42,6 @@ bool fullscreen = true;
 // mirrored display
 bool mirroredDisplay = false;
 
-
 //------------------------------------------------------------------------------
 // STATES
 //------------------------------------------------------------------------------
@@ -181,8 +180,7 @@ cCollisionAABBBox volumeUpdate;
 bool flagMarkVolumeForUpdate = false;
 
 // 3D texture object
-cTexture3dPtr texture;
-cTexture3dPtr textureFoil;
+cTexture3dPtr texture;;
 
 // Making double maxStiffness global
 double maxStiffness;
@@ -193,33 +191,18 @@ double rotationX = 0;
 double rotationY = 0;
 double rotationZ = 0;
 
-double shaderX = 0.0;
-double shaderY = 0.0;
-double shaderZ = 0.0;
-
 // Custom cursor and multiple devices
 
 // load an object file
 bool fileload;
 
-
-
 cMultiMesh* drills[NUM_HAPTIC_DEVICES];
 
 cShapeCylinder* stylus;
 
-// Attempt to retrieve voxel color and print it to the label
-cVector3d localPos;
-cVector3d globalPos;
 cVector3d position;
-cColorb voxelColor;
-int voxelIndexX;
-int voxelIndexY;
-int voxelIndexZ;
-float unroundedX;
 
 cMultiImagePtr image;
-cMultiImagePtr imageFoil;
 
 // a virtual object
 cMultiMesh* tray;
@@ -334,8 +317,6 @@ void toggleGhostMode();
 void toggleHaptics();
 
 void toggleSculpting();
-
-void toggleVirtualReality();
 
 void toggleForceSmoothing();
 
@@ -957,11 +938,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
     else if (a_key == GLFW_KEY_S)
     {
 		toggleSculpting();
-	}
-
-    else if (a_key == GLFW_KEY_R)
-    {
-		toggleVirtualReality();
 	}
 
     else if (a_key == GLFW_KEY_K)
@@ -1697,11 +1673,6 @@ void toggleSculpting()
 		showStatusMessageForSeconds(3.0, "Sculpting (on)");
         button7->m_fontColor.setWhite();
 	}
-}
-
-void toggleVirtualReality()
-{
-
 }
 
 // Function to calculate luminosity including alpha to reduce the effect of fully transparent colors

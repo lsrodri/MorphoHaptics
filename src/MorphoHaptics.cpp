@@ -306,8 +306,6 @@ void exportVolume();
 
 void startExportVolume();
 
-void toggleHaptics();
-
 float  calculateLuminosity(const cColorb& color);
 
 float getAverageLuminosity(int centerX, int centerY, int centerZ, int radius);
@@ -1452,25 +1450,6 @@ void startExportVolume()
     exportVolumeThread = new cThread();
     exportVolumeThread->start(exportVolume, CTHREAD_PRIORITY_GRAPHICS);
 }
-
-void toggleHaptics()
-{
-    if (isHapticsEnabled)
-    {
-		isHapticsEnabled = false;
-		button5->setText("(off) Haptics (H)");
-        toggleStatusMessage(true, "Haptics (off)");
-		button5->m_fontColor.setRed();
-	}
-    else
-    {
-		isHapticsEnabled = true;
-		button5->setText("(on) Haptics (H)");
-        showStatusMessageForSeconds(3.0, "Haptics (on)");
-		button5->m_fontColor.setWhite();
-	}
-}
-
 
 void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
 {

@@ -4,10 +4,12 @@
 
 extern bool isHapticSmoothingEnabled;
 extern bool isVoxelValueHapticsEnabled;
+extern bool isHapticsEnabled;
 
 extern chai3d::cVoxelObject* object;
 
 extern chai3d::cLabel* button4;
+extern chai3d::cLabel* button5;
 extern chai3d::cLabel* button7;
 extern chai3d::cLabel* button8;
 extern chai3d::cLabel* button13;
@@ -83,5 +85,23 @@ void toggleGhostMode()
         button4->setText("(off) Ghost Mode (Space)");
         button4->m_fontColor.setWhite();
         showStatusMessageForSeconds(3.0, "Ghost Mode (off)");
+    }
+}
+
+void toggleHaptics()
+{
+    if (isHapticsEnabled)
+    {
+        isHapticsEnabled = false;
+        button5->setText("(off) Haptics (H)");
+        toggleStatusMessage(true, "Haptics (off)");
+        button5->m_fontColor.setRed();
+    }
+    else
+    {
+        isHapticsEnabled = true;
+        button5->setText("(on) Haptics (H)");
+        showStatusMessageForSeconds(3.0, "Haptics (on)");
+        button5->m_fontColor.setWhite();
     }
 }

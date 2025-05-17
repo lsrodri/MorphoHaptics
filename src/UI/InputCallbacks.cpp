@@ -1,6 +1,11 @@
 #include "../MorphoHaptics.h"
 #include "InputCallbacks.h"
 
+template<typename T>
+T clamp(T x, T min, T max) {
+    return (x < min) ? min : (x > max) ? max : x;
+}
+
 void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY)
 {
     if (mouseState == MOUSE_MOVE_CAMERA)
@@ -26,3 +31,14 @@ void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY)
         }
     }
 }
+
+//------------------------------------------------------------------------------
+
+void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY)
+{
+    double r = camera->getSphericalRadius();
+    r = clamp(r + 0.1 * a_offsetY, 0.5, 3.0);
+    camera->setSphericalRadius(r);
+}
+
+//------------------------------------------------------------------------------

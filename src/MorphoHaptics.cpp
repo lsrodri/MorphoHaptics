@@ -234,8 +234,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
 
 void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
 
-void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY);
-
 void updateGraphics(void);
 
 void updateHaptics(void);
@@ -905,20 +903,6 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
     }
 }
 
-//------------------------------------------------------------------------------
-
-
-
-//------------------------------------------------------------------------------
-
-void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY)
-{
-    double r = camera->getSphericalRadius();
-    r = cClamp(r + 0.1 * a_offsetY, 0.5, 3.0);
-    camera->setSphericalRadius(r);
-}
-
-//------------------------------------------------------------------------------
 
 
 int countFilesInDirectory(const  std::string& path, const  std::string& extension) {

@@ -48,9 +48,6 @@ enum HapticStates
 // maximum number of devices supported by this application
 const int MAX_DEVICES = 16;
 
-// number of haptic devices 
-//const int NUM_HAPTIC_DEVICES = 1;
-
 //------------------------------------------------------------------------------
 // DECLARED VARIABLES
 //------------------------------------------------------------------------------
@@ -77,7 +74,6 @@ cLabel* labelHapticDeviceModel[MAX_DEVICES];
 cToolCursor* tool[MAX_DEVICES];
 
 // a sphere to show the projected point on the surface
-//cShapeSphere* cursor;
 cMultiMesh* cursor[MAX_DEVICES];
 
 // a virtual heart object from a CT scan
@@ -162,9 +158,6 @@ double rotationX = 0;
 double rotationY = 0;
 double rotationZ = 0;
 
-// Custom cursor and multiple devices
-
-// load an object file
 bool fileload;
 
 cMultiMesh* drills[NUM_HAPTIC_DEVICES];
@@ -684,7 +677,6 @@ void errorCallback(int a_error, const char* a_description)
     std::cout << "Error: " << a_description << std::endl;
 }
 
-
 int countFilesInDirectory(const  std::string& path, const  std::string& extension) {
     WIN32_FIND_DATA findFileData;
     HANDLE hFind = FindFirstFile((path + "/*" + extension).c_str(), &findFileData);
@@ -773,7 +765,6 @@ void updateGraphics(void)
 
 void updateHaptics(void)
 {
-
     HapticStates state = HAPTIC_IDLE;
     cGenericObject* selectedObject = NULL;
     cTransform tool_T_object;
@@ -967,7 +958,6 @@ void updateHaptics(void)
 
 //------------------------------------------------------------------------------
 
-
 void startPolygonize()
 {
     toggleStatusMessage(true, "Exporting Model...");
@@ -1075,7 +1065,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
     
     cShaderProgramPtr programShader = object->getShaderProgram();
     
-    
     //--------------------------------------------------------------------------
     // LOAD VOXEL DATA
     //--------------------------------------------------------------------------
@@ -1109,7 +1098,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
         close();
         return;
     }
-    
     
     // create texture
     texture = cTexture3d::create();
@@ -1169,7 +1157,6 @@ void createVoxelObject(cVoxelObject* object, std::string path, char* argv[])
     object->clear();
     object->clearAllChildren();
     object->setUseLinearInterpolation(true);
-
 }
 
 void loadDataset()

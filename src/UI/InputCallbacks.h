@@ -30,9 +30,6 @@ void startExportVolume();
 void updateValueHapticsRadius(int delta);
 void updateProbeRadius(int delta);
 
-//bool isPointInsidePanel(chai3d::cPanel* panel, double x, double y);
-//bool isPointInsideLabel(chai3d::cLabel* label, double x, double y);
-
 void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY);
 void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY);
 void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods);

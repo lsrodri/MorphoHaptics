@@ -163,3 +163,94 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
 }
 
 //------------------------------------------------------------------------------
+
+
+
+void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods)
+{
+
+    if (a_button == GLFW_MOUSE_BUTTON_LEFT && a_action == GLFW_PRESS)
+    {
+        // Get mouse position
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        // Adjust y position because of OpenGL's coordinate system
+        ypos = height - ypos;
+
+        // Check if sandwich button was clicked
+        if (isPointInsidePanel(sandwichButton, xpos, ypos)) {
+            isUILayerVisible = !isUILayerVisible;
+            panel->setShowEnabled(isUILayerVisible);
+        }
+
+        else if (isPointInsideLabel(button1, xpos, ypos)) {
+            loadDataset();
+        }
+
+        else if (isPointInsideLabel(button2, xpos, ypos)) {
+            startPolygonize();
+        }
+
+        else if (isPointInsideLabel(button3, xpos, ypos)) {
+            startExportVolume();
+        }
+
+        else if (isPointInsideLabel(button4, xpos, ypos)) {
+            toggleGhostMode();
+        }
+
+        else if (isPointInsideLabel(button5, xpos, ypos)) {
+            toggleHaptics();
+        }
+
+        else if (isPointInsideLabel(button6, xpos, ypos)) {
+            glfwSetWindowShouldClose(a_window, GLFW_TRUE);
+        }
+
+        else if (isPointInsideLabel(button7, xpos, ypos)) {
+            toggleSculpting();
+        }
+
+        else if (isPointInsideLabel(button8, xpos, ypos)) {
+            toggleVoxelValueHaptics();
+        }
+
+        else if (isPointInsideLabel(button9, xpos, ypos)) {
+            updateProbeRadius(1);
+        }
+
+        else if (isPointInsideLabel(button10, xpos, ypos)) {
+            updateProbeRadius(-1);
+        }
+
+        else if (isPointInsideLabel(button11, xpos, ypos)) {
+            updateValueHapticsRadius(1);
+        }
+
+        else if (isPointInsideLabel(button12, xpos, ypos)) {
+            updateValueHapticsRadius(-1);
+        }
+
+        else if (isPointInsideLabel(button13, xpos, ypos)) {
+            toggleForceSmoothing();
+        }
+
+    }
+
+    if (a_button == GLFW_MOUSE_BUTTON_RIGHT && a_action == GLFW_PRESS)
+    {
+        // store mouse position
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+
+        // update mouse state
+        mouseState = MOUSE_MOVE_CAMERA;
+    }
+
+    else
+    {
+        // update mouse state
+        mouseState = MOUSE_IDLE;
+    }
+}
+

@@ -11,10 +11,13 @@ source_group("" FILES ${no_group_source_files})
 set(Source_Files
     "includes/tinyfiledialogs.c"
     "MorphoHaptics.cpp"
+    "MorphoHaptics.h"
     "UI/UIUtils.cpp"
     "UI/UIUtils.h"
     "UI/UIActions.cpp"
     "UI/UIActions.h"
+    "UI/InputCallbacks.cpp"
+    "UI/InputCallbacks.h"
     "Utils/Utils.h"
     "Utils/Utils.cpp"
 )

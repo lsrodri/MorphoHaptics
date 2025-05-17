@@ -4,10 +4,12 @@
     This project was presented at the ACM KUI 2024 Conference in Florence, Italy
 */
 //==============================================================================
-
+#include "MorphoHaptics.h"
 //------------------------------------------------------------------------------
 #include "chai3d.h"
+
 //------------------------------------------------------------------------------
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <windows.h>
@@ -16,12 +18,16 @@
 #include <tinyfiledialogs.h>
 #include "UI/UIUtils.h"
 #include "UI/UIActions.h"
+#include "UI/InputCallbacks.h"
 #include "Utils/Utils.h"
+
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
+
 using namespace chai3d;
+
 cStereoMode stereoMode = C_STEREO_DISABLED;
 
 // fullscreen mode
@@ -29,15 +35,6 @@ bool fullscreen = true;
 
 // mirrored display
 bool mirroredDisplay = false;
-
-//------------------------------------------------------------------------------
-// STATES
-//------------------------------------------------------------------------------
-enum MouseStates
-{
-    MOUSE_IDLE,
-    MOUSE_MOVE_CAMERA
-};
 
 enum HapticStates
 {
@@ -55,7 +52,7 @@ enum HapticStates
 const int MAX_DEVICES = 16;
 
 // number of haptic devices 
-const int NUM_HAPTIC_DEVICES = 1;
+//const int NUM_HAPTIC_DEVICES = 1;
 
 //------------------------------------------------------------------------------
 // DECLARED VARIABLES
@@ -236,8 +233,6 @@ void errorCallback(int error, const char* a_description);
 void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods);
 
 void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
-
-void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY);
 
 void mouseScrollCallback(GLFWwindow* a_window, double a_offsetX, double a_offsetY);
 
@@ -912,31 +907,7 @@ void mouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a
 
 //------------------------------------------------------------------------------
 
-void mouseMotionCallback(GLFWwindow* a_window, double a_posX, double a_posY)
-{
-    if (mouseState == MOUSE_MOVE_CAMERA)
-    {
-        // compute mouse motion
-        int dx = a_posX - mouseX;
-        int dy = a_posY - mouseY;
-        mouseX = a_posX;
-        mouseY = a_posY;
 
-        // compute new camera angles
-        double azimuthDeg = camera->getSphericalAzimuthDeg() - 0.5 * dx;
-        double polarDeg = camera->getSphericalPolarDeg() - 0.5 * dy;
-
-        //// assign new angles
-        camera->setSphericalAzimuthDeg(azimuthDeg);
-        camera->setSphericalPolarDeg(polarDeg);
-
-        for (int i = 0; i < NUM_HAPTIC_DEVICES; i++)
-        {
-            // oriente tool with camera
-            tool[i]->setLocalRot(camera->getLocalRot());
-        }
-    }
-}
 
 //------------------------------------------------------------------------------
 

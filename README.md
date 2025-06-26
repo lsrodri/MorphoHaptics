@@ -42,6 +42,22 @@ Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was test
 
 <!-- The contained "source code" (i.e., Python scripts and Jupyter Notebooks) of this work is made available under the terms of [GNU GPLv3](./LICENSE). They are fully available also in the [Open Science Framework](https://). -->
 
+## Reference
+```
+@inproceedings{siqueirarodrigues2024morphohaptics,
+  author       = {Siqueira Rodrigues, Lucas and Kosch, Thomas and Nyakatura, John and Zachow, Stefan and Israel, Johann Habakuk},
+  title        = {MorphoHaptics: An Open‐Source Tool for Visuohaptic Exploration of Morphological Image Datasets},
+  booktitle    = {KUI Conference Culture and Computer Science | From Humanism to Digital Humanities (KUI 2024)},
+  year         = {2024},
+  month        = oct,
+  day          = {03--04},
+  address      = {Florence, Italy},
+  publisher    = {ACM},
+  pages        = {1--11},
+  doi          = {10.1145/3719236.3719271}
+}
+```
+
 ## Acknowledgements
 The author acknowledges the support of the Cluster of Excellence »Matters of Activity. Image Space Material« funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy – EXC 2025 – 390648296.
 

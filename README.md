@@ -5,7 +5,7 @@ This repository contains experimental data for the ACM KUI '24 full paper "Morph
 Although digital methods have significantly advanced morphology, practitioners are still challenged to understand and process tomographic specimen data. As automated processing of fossil data remains insufficient, morphologists still engage in intensive manual work to prepare digital fossils for research objectives. We present an open-source tool that enables morphologists to explore tomographic data similarly to the physical workflows that traditional fossil preparators experience in the field. We assessed the usability of our prototype for virtual fossil preparation and its accompanying tasks in the digital preparation workflow. Our findings indicate that integrating haptics into the virtual preparation workflow enhances the understanding of the morphology and material properties of working specimens. Our design's visuohaptic sculpting of fossil volumes was deemed straightforward and an improvement over current tomographic data processing methods.
 
 ## Full Paper
-The paper is in press, but its preprint is available on [arXiv](https://doi.org/10.48550/arXiv.2409.17766).
+The paper is available in the [ACM Digital Library](https://doi.org/10.1145/3719236.3719271).
 
 ## Licenses
 The contained "source code" of this work is made available under the terms of [GNU GPLv3](./LICENSE).
@@ -44,17 +44,22 @@ Open MorphoHaptics.sln in Visual Studio 2022 and build it. The software was test
 
 ## Reference
 ```
-@inproceedings{siqueirarodrigues2024morphohaptics,
-  author       = {Siqueira Rodrigues, Lucas and Kosch, Thomas and Nyakatura, John and Zachow, Stefan and Israel, Johann Habakuk},
-  title        = {MorphoHaptics: An Open‐Source Tool for Visuohaptic Exploration of Morphological Image Datasets},
-  booktitle    = {KUI Conference Culture and Computer Science | From Humanism to Digital Humanities (KUI 2024)},
-  year         = {2024},
-  month        = oct,
-  day          = {03--04},
-  address      = {Florence, Italy},
-  publisher    = {ACM},
-  pages        = {1--11},
-  doi          = {10.1145/3719236.3719271}
+@inproceedings{10.1145/3719236.3719271,
+author = {Siqueira Rodrigues, Lucas and Kosch, Thomas and Nyakatura, John and Zachow, Stefan and Israel, Johann Habakuk},
+title = {MorphoHaptics: An Open-Source Tool for Visuohaptic Exploration of Morphological Image Datasets},
+year = {2025},
+isbn = {9798400710322},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3719236.3719271},
+doi = {10.1145/3719236.3719271},
+booktitle = {Proceedings of the 21st International Conference on Culture and Computer Science: From Humanism to Digital Humanities},
+articleno = {4},
+numpages = {10},
+keywords = {Haptics, Visuohaptic Integration, Feedback, Data Analysis, Data Exploration, Human-Computer Interaction},
+location = {
+},
+series = {KUI '24}
 }
 ```
 
